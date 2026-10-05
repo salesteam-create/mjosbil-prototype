@@ -122,26 +122,58 @@ window.MB_DATA = (function () {
   const products = {
     hakka10: {
       brand: 'Nokian', name: 'Hakkapeliitta 10', spec: '205/55 R16 94T XL', price: 1849, example: true, unit: L('per dekk', 'per tyre'),
-      cat: L('Vinterdekk, piggdekk', 'Winter tyres, studded'), fitsInch: 16, fitting: 'swap',
+      cat: L('Vinterdekk, piggdekk', 'Winter tyres, studded'), fitsInch: 16, fitting: 'swap', img: 'assets/img/hakka.jpg', cover: true,
       bullets: L(['Testvinner for nordiske vinterforhold', 'Piggdekk med kort bremselengde på is', 'Støynivå 67 dB'], ['Test winner for Nordic winter', 'Studded, short braking distance on ice', 'Noise level 67 dB']),
-      color: '#1d2a33',
     },
     sailun: {
       brand: 'Sailun', name: 'Ice Blazer WST3', spec: '205/55 R16 94T', price: 1090, example: true, unit: L('per dekk', 'per tyre'),
       cat: L('Vinterdekk, piggdekk', 'Winter tyres, studded'), fitsInch: 16, fitting: 'swap',
-      bullets: L(['Rimelig piggdekk', 'God grep på snø'], ['Budget studded tyre', 'Good grip on snow']), color: '#28343c',
+      bullets: L(['Rimelig piggdekk', 'God grep på snø'], ['Budget studded tyre', 'Good grip on snow']),
     },
     oil: {
-      brand: 'Castrol', name: 'EDGE 5W-30 LL', spec: '4 liter', price: 799, example: true, unit: L('per kanne', 'per can'),
-      cat: L('Motorolje', 'Engine oil'), fitting: 'oil',
-      bullets: L(['Long Life for VW-konsernet', 'Godkjent VW 504 00 / 507 00'], ['Long Life for VW Group', 'Approved VW 504 00 / 507 00']), color: '#0f3b2e',
+      brand: 'Castrol', name: 'GTX Ultraclean 10W-40', spec: '4 liter', price: 549, example: true, unit: L('per kanne', 'per can'),
+      cat: L('Motorolje', 'Engine oil'), img: 'assets/img/oil.jpg',
+      bullets: L(['Renser motoren og hindrer slam', 'For bensin og diesel'], ['Cleans the engine and prevents sludge', 'For petrol and diesel']),
     },
     heater: {
-      brand: 'Airrex', name: 'AH-200i WiFi', spec: 'Infrarød varmer', price: 6990, example: true, unit: L('stk', 'each'),
-      cat: L('Verksted og garasje', 'Workshop and garage'),
-      bullets: L(['Styres fra mobilen', 'For garasje og verksted'], ['App controlled', 'For garage and workshop']), color: '#3a2a1f',
+      brand: 'Airrex', name: 'AH-200i WiFi', spec: L('Infrarød dieselvarmer', 'Infrared diesel heater'), price: 21990, example: true, unit: L('stk', 'each'),
+      cat: L('Verksted og garasje', 'Workshop and garage'), img: 'assets/img/airrex.jpg',
+      bullets: L(['Styres fra mobilen', 'For garasje og verksted'], ['App controlled', 'For garage and workshop']),
     },
   };
 
-  return { cars, services, addons, symptoms, locations, products, wheelPrice, hotelPrice };
+  // "Min bil": what Mjøsbil already knows about the customer's cars (mock).
+  const garage = {
+    owner: 'Kari Nordmann',
+    cars: ['EL12345', 'DN54321'],
+    EL12345: {
+      km: 52400, nextService: { inMonths: -2, label: L('Forfalt for 2 mnd siden', 'Overdue by 2 months'), pct: 100, warn: true },
+      falck: '2026-08-12',
+      hotel: { loc: 'gjovik', shelf: 'G-14', stored: L('Vinterhjul 19"', 'Winter wheels 19"'), on: L('Sommerhjul', 'Summer wheels'), tread: [6.8, 6.9, 5.1, 5.3], brand: 'Nokian Hakkapeliitta R5 EV' },
+      recos: [
+        { level: 'warn', title: L('Bremseskiver bak har rust', 'Rear brake discs are rusty'), text: L('Notert ved service august 2025. Anbefaler bremseservice innen vinteren.', 'Noted at the August 2025 service. Brake service recommended before winter.'), add: 'brakes' },
+        { level: 'ok', title: L('12V-batteri i god stand', '12V battery in good condition'), text: L('Testet 12,6 V ved siste besøk.', 'Tested at 12.6 V at the last visit.') },
+      ],
+      history: [
+        { date: '2025-08-12', loc: 'gjovik', items: L(['Økonomiservice for elbil'], ['EV economy service']), price: 2495, km: 48210 },
+        { date: '2025-04-07', loc: 'gjovik', items: L(['Hjulskift + dekkhotell (sommer)'], ['Wheel change + tyre hotel (summer)']), price: 2640, km: 45980 },
+        { date: '2025-03-10', loc: 'lillehammer', items: L(['EU-kontroll, godkjent'], ['EU inspection, passed']), price: 1395, km: 45200, doc: true },
+        { date: '2024-10-28', loc: 'gjovik', items: L(['Hjulskift + dekkhotell (vinter)', 'Nye vindusviskere'], ['Wheel change + tyre hotel (winter)', 'New wiper blades']), price: 3039, km: 41750 },
+      ],
+    },
+    DN54321: {
+      km: 168300, nextService: { inMonths: 1, label: L('Om ca. 1 mnd', 'In about 1 month'), pct: 90 },
+      falck: '2026-11-02',
+      hotel: null,
+      recos: [
+        { level: 'warn', title: L('Frontrute har steinsprut', 'Windscreen has a stone chip'), text: L('Kan gi anmerkning på EU-kontrollen. Bør repareres før fristen.', 'May be flagged at the EU inspection. Should be repaired before the deadline.') },
+      ],
+      history: [
+        { date: '2025-11-02', loc: 'dokka', items: L(['Økonomiservice / 20-punktsjekk', 'Oljeskift'], ['Economy service / 20-point check', 'Oil change']), price: 3180, km: 161900 },
+        { date: '2024-11-21', loc: 'dokka', items: L(['EU-kontroll, godkjent'], ['EU inspection, passed']), price: 1495, km: 149300, doc: true },
+      ],
+    },
+  };
+
+  return { cars, services, addons, symptoms, locations, products, garage, wheelPrice, hotelPrice, phone: '61 13 88 88' };
 })();
