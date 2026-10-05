@@ -1,0 +1,1420 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mjøsbil prototype</title>
+<meta name="description" content="Clickable prototype of a new booking journey for Mjøsbil.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0d1820;
+  --ink-2: #33414b;
+  --muted: #66737c;
+  --line: #e2e6e9;
+  --line-2: #eef1f3;
+  --bg: #f4f6f7;
+  --surface: #ffffff;
+  --teal: #00a9c2;        /* Mjøsbil brand accent */
+  --teal-ink: #00788a;    /* accessible teal for text on white */
+  --teal-soft: #e3f6f9;
+  --amber: #b86e00;
+  --amber-soft: #fff4e0;
+  --green: #127a4a;
+  --green-soft: #e4f5ec;
+  --plate-blue: #0d3e9c;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 1px 2px rgba(13, 24, 32, .05), 0 6px 24px rgba(13, 24, 32, .06);
+  --shadow-lg: 0 10px 40px rgba(13, 24, 32, .14);
+  --font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --display: 'Manrope', 'Inter', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 var(--font); -webkit-font-smoothing: antialiased; }
+img, svg { display: block; }
+button, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: inherit; }
+h1, h2, h3 { font-family: var(--display); letter-spacing: -0.02em; margin: 0; line-height: 1.15; }
+p { margin: 0; }
+.muted { color: var(--muted); }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+/* ---------- Prototype ribbon ---------- */
+.ribbon { background: var(--ink); color: #c9d3d9; font-size: 12px; text-align: center; padding: 6px 16px; }
+
+/* ---------- Header ---------- */
+.hdr { position: sticky; top: 0; z-index: 40; background: rgba(255, 255, 255, .92); backdrop-filter: saturate(1.4) blur(12px); border-bottom: 1px solid var(--line); }
+.hdr .wrap { display: flex; align-items: center; gap: 16px; height: 60px; }
+.logo { display: flex; align-items: center; gap: 8px; text-decoration: none; font-family: var(--display); font-weight: 800; letter-spacing: .06em; font-size: 18px; }
+.logo-mark { width: 26px; height: 26px; border-radius: 7px; background: var(--teal); display: grid; place-items: center; }
+.nav { display: none; gap: 4px; margin-left: 12px; }
+.nav a { text-decoration: none; padding: 8px 12px; border-radius: 8px; font-size: 15px; color: var(--ink-2); }
+.nav a:hover { background: var(--line-2); color: var(--ink); }
+.hdr-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.lang { display: flex; border: 1px solid var(--line); border-radius: 999px; padding: 2px; }
+.lang button { border: 0; background: none; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; color: var(--muted); }
+.lang button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.icon-btn { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 10px; border: 0; background: none; position: relative; }
+.icon-btn:hover { background: var(--line-2); }
+.badge-dot { position: absolute; top: 4px; right: 3px; min-width: 16px; height: 16px; border-radius: 8px; background: var(--teal); color: #fff; font-size: 10px; font-weight: 700; display: grid; place-items: center; padding: 0 4px; }
+.hdr .btn-sm { display: none; }
+
+/* ---------- Buttons ---------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 12px; padding: 14px 20px; font-weight: 600; font-size: 16px; text-decoration: none; transition: transform .08s ease, background .15s ease, opacity .15s; white-space: nowrap; }
+.btn:active { transform: scale(.98); }
+.btn-primary { background: var(--ink); color: #fff; }
+.btn-primary:hover { background: #1c2b35; }
+.btn-primary[disabled] { opacity: .35; cursor: not-allowed; }
+.btn-teal { background: var(--teal); color: #fff; }
+.btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.btn-ghost:hover { background: var(--surface); border-color: #cfd6db; }
+.btn-light { background: #fff; color: var(--ink); }
+.btn-sm { padding: 9px 14px; font-size: 14px; border-radius: 10px; }
+.btn-block { width: 100%; }
+.link { background: none; border: 0; padding: 0; color: var(--teal-ink); font-weight: 600; text-decoration: none; font-size: 14px; }
+.link:hover { text-decoration: underline; }
+
+/* ---------- Norwegian plate input ---------- */
+.plate { display: flex; align-items: stretch; background: #fff; border: 2px solid var(--ink); border-radius: 10px; overflow: hidden; height: 60px; max-width: 320px; }
+.plate-eu { width: 34px; background: var(--plate-blue); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 7px; font-weight: 700; font-size: 13px; gap: 4px; }
+.plate-eu .stars { width: 16px; height: 16px; border-radius: 50%; border: 2px dotted #ffd200; }
+.plate input { border: 0; outline: 0; flex: 1; min-width: 0; padding: 0 14px; font: 700 28px/1 'Inter', monospace; letter-spacing: .08em; text-transform: uppercase; }
+.plate input::placeholder { color: #c5cdd2; }
+.plate-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.plate-row .plate { flex: 1 1 220px; }
+.plate-row .btn { height: 60px; flex: 0 0 auto; }
+.plate-chip { display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid var(--ink); border-radius: 6px; padding: 1px 8px 1px 0; font-weight: 700; font-size: 13px; letter-spacing: .05em; background: #fff; }
+.plate-chip::before { content: 'N'; background: var(--plate-blue); color: #fff; font-size: 9px; padding: 3px 4px; border-radius: 4px 0 0 4px; align-self: stretch; display: grid; place-items: end center; }
+.try { font-size: 13px; color: var(--muted); display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
+.try button { background: none; border: 0; padding: 0; }
+
+/* ---------- Home ---------- */
+.hero { background: radial-gradient(1100px 500px at 85% -10%, rgba(0, 169, 194, .28), transparent 60%), linear-gradient(180deg, #0d1820, #12222c); color: #fff; overflow: hidden; }
+.hero .wrap { padding-top: 40px; padding-bottom: 40px; display: grid; gap: 32px; }
+.hero .kicker { color: #8fdbe6; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+.hero h1 { font-size: clamp(34px, 7vw, 58px); margin: 12px 0 14px; font-weight: 800; }
+.hero .sub { color: #b9c6ce; font-size: 17px; max-width: 520px; margin-bottom: 24px; }
+.hero .plate { border-color: #fff; }
+.hero .try { color: #8a9aa4; }
+.hero-card { background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .1); border-radius: 20px; padding: 20px; display: grid; gap: 14px; align-self: end; }
+.hero-car { width: 100%; height: auto; opacity: .95; }
+.usps { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 22px; color: #cfd9de; font-size: 14px; }
+.usps span { display: inline-flex; align-items: center; gap: 6px; }
+.usps svg { color: var(--teal); }
+
+.section { padding: 48px 0; }
+.section-h { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.section-h h2 { font-size: clamp(24px, 4vw, 32px); }
+.section-h p { margin-top: 6px; }
+
+.intents { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.intent { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 16px; text-align: left; display: grid; gap: 10px; align-content: start; min-height: 132px; transition: border-color .15s, box-shadow .15s, transform .15s; }
+.intent:hover { border-color: var(--ink); box-shadow: var(--shadow); transform: translateY(-2px); }
+.intent .ico { width: 42px; height: 42px; border-radius: 12px; background: var(--teal-soft); color: var(--teal-ink); display: grid; place-items: center; }
+.intent b { font-size: 16px; display: block; }
+.intent span span { font-size: 13px; color: var(--muted); }
+
+.split { display: grid; gap: 12px; }
+.promo { border-radius: 20px; padding: 28px; display: grid; gap: 12px; align-content: start; position: relative; overflow: hidden; min-height: 260px; }
+.promo .kicker { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.promo h3 { font-size: 26px; max-width: 420px; }
+.promo p { max-width: 460px; }
+.promo .btn { justify-self: start; margin-top: 8px; }
+.promo-winter { background: linear-gradient(160deg, #dff3f7, #f7fbfc); }
+.promo-winter .kicker { color: var(--teal-ink); }
+.promo-ev { background: #0f1e27; color: #fff; }
+.promo-ev .kicker { color: #8fdbe6; }
+.promo-ev p { color: #b9c6ce; }
+.promo-art { position: absolute; right: -20px; bottom: -20px; opacity: .9; pointer-events: none; }
+
+.eu-check { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 24px; display: grid; gap: 16px; }
+.eu-result { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 14px 16px; border-radius: 12px; background: var(--amber-soft); color: #6b4300; }
+.eu-result.ok { background: var(--green-soft); color: #0b4f30; }
+
+.products { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.pcard { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; text-decoration: none; display: grid; transition: box-shadow .15s, transform .15s; }
+.pcard:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+.pimg { aspect-ratio: 1 / 1; display: grid; place-items: center; background: var(--line-2); }
+.pbody { padding: 12px 14px 16px; display: grid; gap: 2px; }
+.pbody .brand { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.pbody .name { font-weight: 600; font-size: 15px; }
+.pbody .price { font-weight: 700; margin-top: 6px; }
+.pbody .tag { margin-top: 6px; }
+
+.locs { display: grid; gap: 10px; }
+.loc-row { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+.loc-row .pin { width: 36px; height: 36px; border-radius: 10px; background: var(--teal-soft); color: var(--teal-ink); display: grid; place-items: center; flex: none; }
+.loc-row .meta { font-size: 13px; color: var(--muted); }
+.loc-row .btn { margin-left: auto; }
+
+.footer { border-top: 1px solid var(--line); padding: 32px 0 120px; font-size: 14px; color: var(--muted); }
+.footer .wrap { display: grid; gap: 8px; }
+
+/* ---------- Tags ---------- */
+.tag { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 999px; background: var(--line-2); color: var(--ink-2); white-space: nowrap; }
+.tag-teal { background: var(--teal-soft); color: var(--teal-ink); }
+.tag-amber { background: var(--amber-soft); color: var(--amber); }
+.tag-green { background: var(--green-soft); color: var(--green); }
+.tag-dark { background: var(--ink); color: #fff; }
+
+/* ---------- Booking layout ---------- */
+.book { padding: 20px 0 140px; }
+.book .wrap { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
+.book .wrap > * { min-width: 0; }
+.stepper { display: flex; gap: 6px; margin-bottom: 4px; }
+.stepper .s { flex: 1; display: grid; gap: 6px; font-size: 12px; color: var(--muted); }
+.stepper .bar { height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; }
+.stepper .s.past .bar, .stepper .s.on .bar { background: var(--teal); }
+.stepper .s.on { color: var(--ink); font-weight: 600; }
+.stepper .lbl { display: none; }
+.step-h { display: grid; gap: 6px; margin: 8px 0 20px; }
+.step-h h1 { font-size: clamp(26px, 5vw, 36px); font-weight: 800; }
+.back-btn { background: none; border: 0; padding: 6px 0; display: inline-flex; align-items: center; gap: 4px; color: var(--muted); font-size: 14px; font-weight: 500; }
+.back-btn:hover { color: var(--ink); }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.car-card { padding: 18px; display: grid; gap: 14px; }
+.car-top { display: flex; gap: 14px; align-items: center; }
+.car-ico { width: 54px; height: 54px; border-radius: 14px; background: var(--line-2); display: grid; place-items: center; flex: none; }
+.car-name { font-weight: 700; font-size: 18px; }
+.car-facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.fact { background: var(--bg); border-radius: 10px; padding: 10px 12px; }
+.fact small { display: block; color: var(--muted); font-size: 12px; }
+.fact b { font-size: 14px; }
+.lookup-anim { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--teal) 0 30%, var(--line) 30%); background-size: 200% 100%; animation: load 1s linear infinite; margin-top: 12px; }
+@keyframes load { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+
+.grid-intents { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.grid-intents .intent { min-height: 116px; }
+.intent.selected { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.intent .count { justify-self: start; }
+
+.opts { display: grid; gap: 10px; }
+.opt { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; display: grid; gap: 8px; text-align: left; width: 100%; transition: border-color .15s, box-shadow .15s; }
+.opt:hover { border-color: #c4ccd2; }
+.opt.on { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.opt-top { display: flex; gap: 12px; align-items: flex-start; }
+.opt-check { width: 24px; height: 24px; border-radius: 7px; border: 2px solid #c4ccd2; flex: none; display: grid; place-items: center; margin-top: 1px; transition: all .15s; color: #fff; }
+.opt.on .opt-check { background: var(--ink); border-color: var(--ink); }
+.opt-title { font-weight: 600; flex: 1; }
+.opt-price { font-weight: 700; white-space: nowrap; text-align: right; }
+.opt-price small { display: block; font-weight: 500; color: var(--muted); font-size: 11px; }
+.opt-desc { color: var(--muted); font-size: 14px; padding-left: 36px; }
+.opt-meta { display: flex; gap: 6px; flex-wrap: wrap; padding-left: 36px; }
+.opt-incl { padding-left: 36px; font-size: 14px; color: var(--ink-2); display: grid; gap: 4px; }
+.opt-incl div { display: flex; gap: 8px; align-items: flex-start; }
+.opt-incl svg { color: var(--teal-ink); flex: none; margin-top: 3px; }
+.opt-more { padding-left: 36px; }
+
+.addons { display: grid; gap: 8px; }
+.addon { text-align: left; width: 100%; display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px dashed #cdd4d9; border-radius: 14px; padding: 12px 14px; }
+.addon.on { border-style: solid; border-color: var(--ink); }
+.addon .t { flex: 1; min-width: 0; }
+.addon .t b { font-size: 15px; display: block; }
+.addon .t span { font-size: 13px; color: var(--muted); }
+.addon .p { font-weight: 700; font-size: 14px; white-space: nowrap; }
+
+.note { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 12px; background: var(--teal-soft); color: #064e59; font-size: 14px; }
+.note.amber { background: var(--amber-soft); color: #6b4300; }
+.note svg { flex: none; margin-top: 2px; }
+.stack { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+.sub-h { font-weight: 700; font-size: 17px; margin-top: 8px; }
+
+.symptoms { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.sym { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; gap: 10px; align-items: center; text-align: left; font-weight: 500; font-size: 14px; }
+.sym .ico { color: var(--teal-ink); flex: none; }
+.sym.on { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+textarea, .input { width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 14px; outline: none; transition: border-color .15s, box-shadow .15s; }
+textarea { min-height: 96px; resize: vertical; }
+textarea:focus, .input:focus { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(0, 169, 194, .18); }
+.attach { display: flex; gap: 10px; align-items: center; border: 1px dashed #cdd4d9; border-radius: 12px; padding: 14px; background: var(--surface); width: 100%; text-align: left; color: var(--ink-2); font-size: 14px; }
+
+/* Locations + time */
+.loc-pick { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.loc-pick::-webkit-scrollbar { display: none; }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 8px 14px; font-size: 14px; font-weight: 500; white-space: nowrap; }
+.chip.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+.loc-list { display: grid; gap: 8px; }
+.loc { display: flex; gap: 12px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; text-align: left; width: 100%; }
+.loc.on { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.loc[disabled] { opacity: .5; cursor: not-allowed; background: transparent; }
+.loc .radio { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #c4ccd2; flex: none; display: grid; place-items: center; }
+.loc.on .radio { border-color: var(--ink); }
+.loc.on .radio::after { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--ink); }
+.loc .t { flex: 1; min-width: 0; }
+.loc .t b { display: block; }
+.loc .t span { font-size: 13px; color: var(--muted); }
+.loc .first { text-align: right; font-size: 13px; }
+.loc .first b { display: block; color: var(--green); font-size: 14px; }
+
+.days { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 6px; scrollbar-width: none; }
+.days::-webkit-scrollbar { display: none; }
+.day { flex: none; width: 66px; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 10px 0; display: grid; gap: 2px; text-align: center; }
+.day small { font-size: 12px; color: var(--muted); text-transform: capitalize; }
+.day b { font-size: 18px; }
+.day .dots { font-size: 11px; color: var(--green); font-weight: 600; }
+.day.full .dots { color: var(--muted); }
+.day.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+.day.on small, .day.on .dots { color: #b9c6ce; }
+.slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.slot { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 11px 0; font-weight: 600; font-size: 15px; }
+.slot.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+.slot[disabled] { color: #b5bec4; background: transparent; text-decoration: line-through; cursor: not-allowed; }
+.radios { display: grid; gap: 8px; }
+.radio-row { display: flex; gap: 12px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; text-align: left; width: 100%; }
+.radio-row .radio { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #c4ccd2; flex: none; display: grid; place-items: center; }
+.radio-row.on { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.radio-row.on .radio { border-color: var(--ink); }
+.radio-row.on .radio::after { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--ink); }
+.radio-row[disabled] { opacity: .5; cursor: not-allowed; }
+.radio-row span span { font-size: 13px; color: var(--muted); display: block; }
+
+/* Contact form */
+.form { display: grid; gap: 12px; }
+.field { display: grid; gap: 6px; }
+.field label { font-size: 14px; font-weight: 600; }
+.vipps { background: #ff5b24; color: #fff; }
+.vipps:hover { background: #e94e19; }
+.divider { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 13px; }
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+.check { display: flex; gap: 10px; align-items: center; font-size: 14px; }
+.check input { width: 20px; height: 20px; accent-color: var(--ink); }
+.err { color: #b42318; font-size: 14px; }
+
+/* Review */
+.review { display: grid; gap: 0; }
+.review-row { display: flex; gap: 12px; padding: 16px; border-bottom: 1px solid var(--line-2); align-items: flex-start; }
+.review-row:last-child { border-bottom: 0; }
+.review-row .ico { color: var(--muted); flex: none; margin-top: 2px; }
+.review-row .t { flex: 1; min-width: 0; font-size: 15px; }
+.review-row .t small { display: block; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; font-weight: 600; margin-bottom: 2px; }
+
+/* Summary: bottom bar on mobile, sticky card on desktop */
+.summary { display: none; }
+.mbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; background: rgba(255, 255, 255, .96); backdrop-filter: blur(12px); border-top: 1px solid var(--line); padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); display: flex; gap: 12px; align-items: center; }
+.mbar .tot { flex: 1; min-width: 0; }
+.mbar .tot small { display: block; font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mbar .tot b { font-size: 18px; }
+.mbar .btn { min-width: 132px; }
+.sum-card { padding: 20px; display: grid; gap: 14px; }
+.sum-card h3 { font-size: 18px; }
+.sum-items { display: grid; gap: 10px; }
+.sum-item { display: flex; gap: 10px; font-size: 14px; align-items: flex-start; }
+.sum-item .n { flex: 1; }
+.sum-item .x { background: none; border: 0; padding: 0 2px; color: var(--muted); }
+.sum-item .x:hover { color: var(--ink); }
+.sum-tot { display: flex; justify-content: space-between; align-items: baseline; border-top: 1px solid var(--line); padding-top: 14px; }
+.sum-tot b { font-size: 22px; }
+.sum-meta { display: grid; gap: 6px; font-size: 14px; color: var(--ink-2); }
+.sum-meta div { display: flex; gap: 8px; align-items: center; }
+.sum-meta svg { color: var(--muted); }
+
+/* Done */
+.done { text-align: center; display: grid; gap: 14px; justify-items: center; padding: 24px 0; }
+.done-ico { width: 72px; height: 72px; border-radius: 50%; background: var(--green-soft); color: var(--green); display: grid; place-items: center; animation: pop .4s ease; }
+@keyframes pop { from { transform: scale(.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.done h1 { font-size: clamp(26px, 5vw, 36px); font-weight: 800; }
+.ref { font: 700 20px/1 'Inter', monospace; letter-spacing: .08em; }
+.done-card { width: 100%; max-width: 560px; text-align: left; }
+.done-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+
+/* Product page */
+.pdp { padding: 20px 0 140px; }
+.pdp .wrap { display: grid; gap: 24px; }
+.crumbs { font-size: 13px; color: var(--muted); display: flex; gap: 6px; flex-wrap: wrap; }
+.crumbs a { text-decoration: none; }
+.pdp-img { border-radius: 20px; background: var(--surface); border: 1px solid var(--line); aspect-ratio: 1 / 1; display: grid; place-items: center; }
+.pdp-info { display: grid; gap: 16px; align-content: start; }
+.pdp-info h1 { font-size: clamp(26px, 5vw, 36px); font-weight: 800; }
+.pdp-price { font-size: 28px; font-weight: 800; font-family: var(--display); }
+.pdp-price small { font-size: 14px; font-weight: 500; color: var(--muted); font-family: var(--font); }
+.bullets { display: grid; gap: 6px; font-size: 15px; }
+.bullets div { display: flex; gap: 8px; }
+.bullets svg { color: var(--teal-ink); flex: none; margin-top: 4px; }
+.fit-box { padding: 16px; display: grid; gap: 12px; }
+.fit-res { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 10px; font-size: 14px; font-weight: 600; }
+.fit-res.ok { background: var(--green-soft); color: var(--green); }
+.fit-res.no { background: var(--amber-soft); color: var(--amber); flex-wrap: wrap; }
+.qty { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.qty button { width: 44px; height: 44px; border: 0; background: none; font-size: 20px; }
+.qty span { min-width: 32px; text-align: center; font-weight: 700; }
+.toast { position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 12px 18px; border-radius: 12px; font-size: 14px; box-shadow: var(--shadow-lg); z-index: 60; animation: pop .25s ease; }
+
+/* ---------- Desktop ---------- */
+@media (min-width: 720px) {
+  .intents { grid-template-columns: repeat(5, 1fr); }
+  .products { grid-template-columns: repeat(4, 1fr); }
+  .split { grid-template-columns: 1fr 1fr; }
+  .eu-check { grid-template-columns: 1fr auto; align-items: center; }
+  .grid-intents { grid-template-columns: repeat(3, 1fr); }
+  .symptoms { grid-template-columns: repeat(4, 1fr); }
+  .slots { grid-template-columns: repeat(6, 1fr); }
+  .locs { grid-template-columns: repeat(5, 1fr); }
+  .loc-row { flex-direction: column; align-items: flex-start; }
+  .loc-row .btn { margin-left: 0; margin-top: 4px; }
+  .stepper .lbl { display: block; }
+}
+@media (min-width: 960px) {
+  .nav { display: flex; }
+  .hdr .btn-sm { display: inline-flex; }
+  .hero .wrap { grid-template-columns: 1.15fr .85fr; padding-top: 72px; padding-bottom: 72px; align-items: center; }
+  .book .wrap { grid-template-columns: minmax(0, 1fr) 340px; align-items: start; gap: 40px; }
+  .book .main { grid-column: 1; }
+  .summary { display: block; position: sticky; top: 84px; }
+  .mbar.has-side { display: none; }
+  .pdp .wrap { grid-template-columns: 1fr 1fr; gap: 48px; }
+  .pdp .crumbs { grid-column: 1 / -1; }
+  .footer { padding-bottom: 40px; }
+  .book { padding-bottom: 60px; }
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+// Prototype data. Prices marked `example: true` are illustrative; the rest come from
+// Mjøsbil's live VerkstedPlus / mjosbil.no pages (October 2026).
+window.MB_DATA = (function () {
+  const L = (no, en) => ({ no, en });
+
+  // Demo vehicles returned by the mock reg.nr lookup.
+  const cars = {
+    EL12345: {
+      plate: 'EL 12345', make: 'Volkswagen', model: 'ID.4 Pro Performance', year: 2021,
+      fuel: 'ev', weight: 2120, wheel: 19, euDue: '2027-03-31', lastService: L('14 mnd siden', '14 months ago'),
+    },
+    DN54321: {
+      plate: 'DN 54321', make: 'Škoda', model: 'Octavia Combi 2.0 TDI', year: 2017,
+      fuel: 'diesel', weight: 1940, wheel: 16, euDue: '2026-11-30', lastService: L('11 mnd siden', '11 months ago'),
+    },
+    BR11223: {
+      plate: 'BR 11223', make: 'Fiat', model: 'Ducato Bobil', year: 2016,
+      fuel: 'diesel', weight: 3650, wheel: 16, euDue: '2027-06-30', lastService: L('2 år siden', '2 years ago'),
+    },
+    _default: {
+      make: 'Toyota', model: 'Yaris 1.5 Hybrid', year: 2019,
+      fuel: 'hybrid', weight: 1565, wheel: 15, euDue: '2027-08-31', lastService: L('9 mnd siden', '9 months ago'),
+    },
+  };
+
+  // Booking mode: 'live' = confirmed slot (bookable in VerkstedPlus today),
+  // 'request' = workshop confirms the time afterwards.
+  const services = {
+    // Service and maintenance
+    ev_eco:      { cat: 'service', name: L('Økonomiservice for elbil', 'EV economy service'), price: 2495, mins: 90, mode: 'request', fuel: ['ev'],
+                   desc: L('For elbiler over 5 år eller uten nybilgaranti. Inkl. 1 års mobilitetsgaranti med Falck.', 'For EVs over 5 years old or out of warranty. Includes 1 year mobility guarantee with Falck.'),
+                   incl: L(['Skift av kupéfilter', 'Test av 12V-batteri', 'Avlesning av feilkoder', 'Kontroll av ladekontakt og høyspentanlegg', '20 kontrollpunkter'], ['Cabin filter replacement', '12V battery test', 'Fault code readout', 'Charge port and high-voltage check', '20 inspection points']) },
+    ev_eco_brk:  { cat: 'service', name: L('Økonomiservice for elbil inkl. bremseservice', 'EV economy service incl. brake service'), price: 3990, mins: 150, mode: 'request', fuel: ['ev'],
+                   desc: L('Alt i økonomiservice, pluss rengjøring og smøring av bremsene. Anbefales årlig for elbil.', 'Everything in the economy service, plus brake cleaning and lubrication. Recommended yearly for EVs.'),
+                   incl: L(['Alt i økonomiservice', 'Demontering, rens og smøring av bremser'], ['Everything in economy service', 'Brake strip-down, clean and lubrication']) },
+    maker:       { cat: 'service', name: L('Service etter fabrikantens krav', 'Manufacturer schedule service'), price: 3490, from: true, example: true, mins: 150, mode: 'request', fuel: ['ev', 'diesel', 'petrol', 'hybrid'],
+                   desc: L('Ordinær service etter bilprodusentens serviceprogram. Bevarer nybilgarantien.', 'Scheduled service following the manufacturer programme. Keeps your warranty valid.'),
+                   incl: L(['Serviceprogram for din bilmodell', 'Stempel i digitalt servicehefte', 'Pris bekreftes for din bil'], ['Service programme for your model', 'Digital service book stamp', 'Price confirmed for your car']) },
+    eco20:       { cat: 'service', name: L('Økonomiservice / 20-punktsjekk', 'Economy service / 20-point check'), price: 1790, mins: 60, mode: 'live', fuel: ['diesel', 'petrol', 'hybrid'],
+                   desc: L('Rimelig sjekk av bilens viktigste punkter. Olje og filter kommer i tillegg.', 'Affordable check of the key points. Oil and filter extra.'),
+                   incl: L(['20 kontrollpunkter', 'Bremser på bremserulle', 'Avlesning av feilkoder', 'Ett års mobilitetsgaranti'], ['20 inspection points', 'Brake roller test', 'Fault code readout', 'One year mobility guarantee']) },
+    oil:         { cat: 'service', name: L('Oljeskift', 'Oil change'), price: 1390, from: true, example: true, mins: 45, mode: 'request', fuel: ['diesel', 'petrol', 'hybrid'],
+                   desc: L('Skift av motorolje og oljefilter.', 'Engine oil and filter change.'),
+                   incl: L(['Motorolje etter spesifikasjon', 'Nytt oljefilter'], ['Engine oil to spec', 'New oil filter']) },
+
+    // EU inspection
+    pkk:         { cat: 'eu', name: L('EU-kontroll', 'EU inspection (PKK)'), price: 1395, mins: 60, mode: 'live', maxWeight: 3500,
+                   desc: L('Periodisk kjøretøykontroll for biler inntil 3 500 kg.', 'Periodic vehicle inspection for vehicles up to 3,500 kg.'),
+                   incl: L(['Trafikksikkerhet: lys, sikt, hjul, belter og bremser', 'Miljø: støy og avgass', 'Godkjenning rett til Statens vegvesen'], ['Safety: lights, visibility, wheels, belts, brakes', 'Environment: noise and emissions', 'Approval sent directly to the road authority']) },
+    pkk_heavy:   { cat: 'eu', name: L('EU-kontroll tyngre kjøretøy (3,5–7,5 t)', 'EU inspection heavy vehicle (3.5–7.5 t)'), price: 2495, mins: 90, mode: 'live', minWeight: 3500,
+                   desc: L('For bobiler og varebiler mellom 3 500 og 7 500 kg.', 'For motorhomes and vans between 3,500 and 7,500 kg.'),
+                   incl: L(['Full periodisk kontroll', 'Godkjenning rett til Statens vegvesen'], ['Full periodic inspection', 'Approval sent directly to the road authority']) },
+    recheck:     { cat: 'eu', name: L('Etterkontroll', 'Re-inspection'), price: 545, mins: 30, mode: 'live',
+                   desc: L('Etter underkjent EU-kontroll, når feilene er rettet.', 'After a failed inspection, once faults are fixed.'),
+                   incl: L(['Kontroll av punktene som ble underkjent'], ['Check of the failed points']) },
+
+    // Tyres
+    swap:        { cat: 'tyre', name: L('Hjulskift', 'Wheel change'), price: 0, mins: 30, mode: 'live', bySize: true,
+                   desc: L('Bytte av alle fire hjul. Ta med hjul, bolter og eventuell låsenøkkel.', 'Swap all four wheels. Bring wheels, bolts and any locking key.'),
+                   incl: L(['Bytte av 4 hjul', 'Kontroll av dekktrykk og mønsterdybde'], ['Swap 4 wheels', 'Tyre pressure and tread check']) },
+    hotel:       { cat: 'tyre', name: L('Hjulskift + dekkhotell', 'Wheel change + tyre hotel'), price: 0, mins: 30, mode: 'live', bySize: true, hotel: true,
+                   desc: L('Vi skifter, vasker og lagrer hjulene dine til neste sesong. Ingen løfting hjemme.', 'We swap, wash and store your wheels until next season. No lifting at home.'),
+                   incl: L(['Bytte av 4 hjul', 'Vask og lagring til neste sesong', 'Tilstandsrapport på SMS'], ['Swap 4 wheels', 'Wash and storage until next season', 'Condition report by SMS']) },
+
+    // Something is wrong
+    diag:        { cat: 'issue', name: L('Feilsøking og diagnose', 'Fault finding and diagnosis'), price: 1000, mins: 60, mode: 'request',
+                   desc: L('Vi finner feilen og ringer deg med prisoverslag før vi reparerer noe.', 'We find the fault and call you with an estimate before any repair.'),
+                   incl: L(['Feilsøking med diagnoseutstyr', 'Prisoverslag før reparasjon', 'Ingen arbeid uten din godkjenning'], ['Diagnostic equipment', 'Estimate before repair', 'No work without your approval']) },
+
+    // Other
+    ac:          { cat: 'other', name: L('AC-service', 'AC service'), price: 2499, mins: 60, mode: 'live',
+                   desc: L('Påfylling av kjølegass og kontroll av anlegget.', 'Refrigerant refill and system check.') },
+    align:       { cat: 'other', name: L('Firehjulskontroll inkl. justering', 'Wheel alignment'), price: 2490, mins: 60, mode: 'live',
+                   desc: L('Kontroll og justering av hjulvinkler. Bilen går rett og dekkene varer lenger.', 'Check and adjust wheel angles. Drives straight, tyres last longer.') },
+    flush:       { cat: 'other', name: L('Flushing av automatgirkasse', 'Automatic gearbox flush'), price: 2990, mins: 120, mode: 'live', fuel: ['diesel', 'petrol', 'hybrid'],
+                   desc: L('Full rens av automatgirkassen. Olje og filter kommer i tillegg.', 'Full flush of the automatic gearbox. Oil and filter extra.') },
+    rv:          { cat: 'other', name: L('Bobil- og caravanservice', 'Motorhome and caravan service'), price: 0, quote: true, mins: 180, mode: 'request',
+                   desc: L('Service på bobil, campingvogn og tilhenger. Vi gir deg pris før vi starter.', 'Service for motorhomes, caravans and trailers. Price confirmed before we start.') },
+
+    // Add-ons
+    brakes:      { cat: 'addon', name: L('Bremseservice', 'Brake service'), price: 1490, from: true, example: true, mins: 60, mode: 'request',
+                   desc: L('Rens og smøring av bremser. Viktig for elbiler som bremser lite mekanisk.', 'Brake clean and lubrication. Important for EVs that rarely use mechanical brakes.') },
+    wipers:      { cat: 'addon', name: L('Nye vindusviskere', 'New wiper blades'), price: 399, from: true, example: true, mins: 10, mode: 'live',
+                   desc: L('Montert mens du venter.', 'Fitted while you wait.') },
+    battery:     { cat: 'addon', name: L('Batteritest', 'Battery test'), price: 290, example: true, mins: 10, mode: 'live',
+                   desc: L('Unngå startproblemer i vinter.', 'Avoid start problems this winter.') },
+    pre_pkk:     { cat: 'addon', name: L('Sjekk før EU-kontroll', 'Pre-inspection check'), price: 490, example: true, mins: 20, mode: 'live',
+                   desc: L('Vi sjekker de vanligste feilene først, så slipper du etterkontroll.', 'We check the most common faults first, so you avoid a re-inspection.') },
+  };
+
+  const wheelPrice = (inch) => (inch <= 16 ? 570 : inch <= 18 ? 690 : 750);
+  const hotelPrice = (inch) => (inch <= 16 ? 1590 : inch <= 18 ? 1790 : inch <= 20 ? 1890 : 1990);
+
+  // Recommended add-ons per main service (a short, sensible list instead of today's rules).
+  const addons = {
+    ev_eco: ['brakes', 'wipers'], ev_eco_brk: ['wipers', 'battery'], maker: ['wipers', 'battery'], eco20: ['wipers', 'battery'], oil: ['wipers', 'battery'],
+    pkk: ['pre_pkk', 'wipers'], pkk_heavy: ['pre_pkk'], swap: ['align', 'battery'], hotel: ['align', 'battery'],
+    diag: ['battery'], ac: ['wipers'],
+  };
+
+  const symptoms = [
+    { id: 'light', icon: 'alert', name: L('Varsellampe lyser', 'Warning light is on') },
+    { id: 'noise', icon: 'sound', name: L('Rar lyd', 'Strange noise') },
+    { id: 'brakes', icon: 'disc', name: L('Bremsene oppfører seg rart', 'Brakes feel wrong') },
+    { id: 'pull', icon: 'steer', name: L('Bilen trekker skjevt', 'Car pulls to one side'), suggest: 'align' },
+    { id: 'ac', icon: 'snow', name: L('Klima / AC virker ikke', 'Climate / AC not working'), suggest: 'ac' },
+    { id: 'charge', icon: 'bolt', name: L('Lading eller rekkevidde', 'Charging or range'), fuel: ['ev'] },
+    { id: 'start', icon: 'key', name: L('Starter dårlig', 'Hard to start'), suggest: 'battery', fuel: ['diesel', 'petrol', 'hybrid'] },
+    { id: 'other', icon: 'dots', name: L('Noe annet', 'Something else') },
+  ];
+
+  // Five workshops. Gjøvik and Gjøvik Vulk (tyres) are shown as one place.
+  // `no` lists services a location can't do (from the live booking form rules).
+  const locations = [
+    { id: 'gjovik', name: 'Mjøsbil Gjøvik', area: 'Hunndalen', addr: 'Mattisrudsvingen 9, 2827 Gjøvik', km: { gjovik: 3, lillehammer: 45, otta: 135, dokka: 50, favang: 95 }, no: [], seed: 3 },
+    { id: 'lillehammer', name: 'Mjøsbil Lillehammer', area: 'Lillehammer', addr: 'Lillehammer', km: { gjovik: 45, lillehammer: 2, otta: 95, dokka: 75, favang: 50 }, no: [], seed: 7 },
+    { id: 'dokka', name: 'Mjøsbil Dokka', area: 'Dokka', addr: 'Dokka', km: { gjovik: 50, lillehammer: 75, otta: 165, dokka: 1, favang: 120 }, no: [], seed: 11 },
+    { id: 'favang', name: 'Mjøsbil Fåvang', area: 'Fåvang', addr: 'Fåvang', km: { gjovik: 95, lillehammer: 50, otta: 50, dokka: 120, favang: 1 }, no: ['pkk_heavy', 'flush'], seed: 5 },
+    { id: 'otta', name: 'Mjøsbil Otta', area: 'Otta', addr: 'Otta', km: { gjovik: 135, lillehammer: 95, otta: 2, dokka: 165, favang: 50 }, no: ['pkk_heavy', 'rv'], seed: 9 },
+  ];
+
+  const products = {
+    hakka10: {
+      brand: 'Nokian', name: 'Hakkapeliitta 10', spec: '205/55 R16 94T XL', price: 1849, example: true, unit: L('per dekk', 'per tyre'),
+      cat: L('Vinterdekk, piggdekk', 'Winter tyres, studded'), fitsInch: 16, fitting: 'swap',
+      bullets: L(['Testvinner for nordiske vinterforhold', 'Piggdekk med kort bremselengde på is', 'Støynivå 67 dB'], ['Test winner for Nordic winter', 'Studded, short braking distance on ice', 'Noise level 67 dB']),
+      color: '#1d2a33',
+    },
+    sailun: {
+      brand: 'Sailun', name: 'Ice Blazer WST3', spec: '205/55 R16 94T', price: 1090, example: true, unit: L('per dekk', 'per tyre'),
+      cat: L('Vinterdekk, piggdekk', 'Winter tyres, studded'), fitsInch: 16, fitting: 'swap',
+      bullets: L(['Rimelig piggdekk', 'God grep på snø'], ['Budget studded tyre', 'Good grip on snow']), color: '#28343c',
+    },
+    oil: {
+      brand: 'Castrol', name: 'EDGE 5W-30 LL', spec: '4 liter', price: 799, example: true, unit: L('per kanne', 'per can'),
+      cat: L('Motorolje', 'Engine oil'), fitting: 'oil',
+      bullets: L(['Long Life for VW-konsernet', 'Godkjent VW 504 00 / 507 00'], ['Long Life for VW Group', 'Approved VW 504 00 / 507 00']), color: '#0f3b2e',
+    },
+    heater: {
+      brand: 'Airrex', name: 'AH-200i WiFi', spec: 'Infrarød varmer', price: 6990, example: true, unit: L('stk', 'each'),
+      cat: L('Verksted og garasje', 'Workshop and garage'),
+      bullets: L(['Styres fra mobilen', 'For garasje og verksted'], ['App controlled', 'For garage and workshop']), color: '#3a2a1f',
+    },
+  };
+
+  return { cars, services, addons, symptoms, locations, products, wheelPrice, hotelPrice };
+})();
+</script>
+<script>
+window.MB_I18N = {
+  no: {
+    nav_workshop: 'Verksted', nav_tyres: 'Dekk', nav_shop: 'Nettbutikk', nav_locations: 'Avdelinger', nav_book: 'Bestill time',
+    proto_note: 'Prototype for Mjøsbil. Priser, tider og kjøretøydata er eksempler.',
+
+    hero_kicker: 'Verksted · Dekk · Butikk',
+    hero_title: 'Alt bilen trenger.<br>Bestilt på under ett minutt.',
+    hero_sub: 'Skriv inn bilnummeret, så viser vi hva bilen din trenger, hva det koster og når vi har ledig tid.',
+    plate_placeholder: 'AB 12345',
+    hero_cta: 'Finn ledig time',
+    hero_try: 'Prøv:',
+    usp_price: 'Fast pris før du bestiller',
+    usp_ev: 'Elbil-sertifiserte mekanikere',
+    usp_falck: 'Mobilitetsgaranti med Falck',
+
+    intent_title: 'Hva trenger du hjelp med?',
+    i_service: 'Service', i_service_sub: 'Service og oljeskift',
+    i_eu: 'EU-kontroll', i_eu_sub: 'Periodisk kontroll',
+    i_tyre: 'Dekk og hjulskift', i_tyre_sub: 'Hjulskift og dekkhotell',
+    i_issue: 'Noe er galt', i_issue_sub: 'Lyd, lampe eller feil',
+    i_other: 'Andre tjenester', i_other_sub: 'AC, hjulstilling, bobil',
+
+    season_kicker: 'Oktober',
+    season_title: 'Klar for vinterhjul?',
+    season_text: 'Book hjulskift nå og la hjulene bo på dekkhotellet vårt. Vi har ledige timer denne uken.',
+    season_cta: 'Bestill hjulskift',
+
+    ev_kicker: 'Vi kan elbil',
+    ev_title: 'Elbilservice som tar vare på bremsene og batteriet',
+    ev_text: 'Elbiler bremser lite mekanisk, og norsk salt og fukt gjør at bremsene ruster. Vår økonomiservice for elbil inkluderer kontroll av høyspentanlegg, ladekontakt og 12V-batteri.',
+    ev_cta: 'Se elbilservice',
+
+    eu_check_title: 'Når må bilen på EU-kontroll?',
+    eu_check_text: 'Skriv inn bilnummeret, så viser vi fristen og ledige timer.',
+    eu_check_cta: 'Sjekk frist',
+    eu_due_in: 'Frist {date}',
+
+    shop_title: 'Fra nettbutikken',
+    shop_sub: 'Kjøp dekk og deler, og få dem montert hos oss på samme bestilling.',
+    shop_fit: 'Kan monteres hos oss',
+    shop_all: 'Se hele butikken',
+
+    loc_title: 'Fem verksteder i Innlandet',
+    loc_sub: 'Gjøvik, Lillehammer, Dokka, Fåvang og Otta. Verksted, dekk og BilXtra-butikk på samme sted.',
+
+    // Booking
+    step_car: 'Bil', step_need: 'Behov', step_time: 'Sted og tid', step_you: 'Dine detaljer', step_confirm: 'Bekreft',
+    back: 'Tilbake', next: 'Neste', continue: 'Fortsett',
+    car_title: 'Hvilken bil gjelder det?',
+    car_sub: 'Vi henter bilinfo fra Statens vegvesen, så du slipper å fylle ut modell og år.',
+    car_lookup: 'Hent bil',
+    car_found: 'Vi fant bilen din',
+    car_not_you: 'Ikke riktig bil?',
+    car_ev: 'Elbil', car_diesel: 'Diesel', car_petrol: 'Bensin', car_hybrid: 'Hybrid',
+    car_eu: 'EU-kontroll', car_last_service: 'Siste service', car_wheels: 'Hjul',
+    car_eu_soon: 'Snart frist',
+
+    need_title: 'Hva trenger bilen?',
+    need_sub: 'Velg det som passer best. Du kan legge til mer etterpå.',
+    need_for: 'For {car}',
+    recommended: 'Anbefalt for din bil',
+    includes: 'Dette er inkludert',
+    from: 'fra',
+    price_quote: 'Pris etter avtale',
+    example_price: 'eksempelpris',
+    add: 'Legg til', added: 'Lagt til', remove: 'Fjern',
+    addons_title: 'Ofte bestilt sammen med',
+    more_title: 'Trenger bilen noe mer?',
+    more_cta: 'Legg til en tjeneste til',
+    live: 'Bekreftet time',
+    request: 'Vi bekrefter tiden',
+    mins: 'min', hours: 't',
+    tyre_size: 'Hjulstørrelse fra registreringsdata: {inch}"',
+    tyre_hotel_note: 'Har du allerede hjul på dekkhotell hos oss? Vi finner dem på bilnummeret.',
+    tyre_new: 'Trenger du nye dekk?',
+    tyre_new_cta: 'Se vinterdekk som passer',
+    tyre_season: 'per sesong',
+    eu_due_text: 'Bilen din har frist for EU-kontroll {date}.',
+    eu_due_soon_text: 'Fristen er om {weeks} uker. Vi har ledige timer før fristen.',
+    issue_title: 'Hva merker du?',
+    issue_sub: 'Velg det som ligner mest. Det hjelper mekanikeren å forberede seg.',
+    issue_desc: 'Beskriv kort (valgfritt)',
+    issue_desc_ph: 'F.eks. «Motorlampen lyser og bilen lugger i oppoverbakke»',
+    issue_attach: 'Legg ved bilde, video eller lyd',
+    issue_attached: 'lagt ved',
+    issue_promise: 'Vi ringer deg med prisoverslag før vi reparerer noe.',
+    issue_suggest: 'Basert på det du beskriver, kan dette også være aktuelt:',
+
+    time_title: 'Hvor og når passer det?',
+    time_sub: 'Vi viser bare verksteder som kan gjøre alt du har valgt.',
+    near: 'Nær meg', near_pick: 'Jeg er nærmest',
+    first_free: 'Første ledige', km: 'km',
+    cant_do: 'Kan ikke ta {service}',
+    pick_day: 'Velg dag', pick_time: 'Velg tidspunkt',
+    handover: 'Hvordan vil du levere bilen?',
+    h_wait: 'Jeg venter mens dere jobber', h_wait_sub: 'Kaffe og wifi i butikken',
+    h_drop: 'Jeg leverer bilen og henter senere', h_drop_sub: 'Vi sender SMS når den er klar',
+    h_wait_long: 'Tar over 90 min, så vi anbefaler å levere bilen',
+    req_note: 'Noen av tjenestene trenger vi å planlegge manuelt. Velg ønsket tid, så bekrefter vi innen 2 timer i åpningstiden.',
+    no_slots: 'Fullt denne dagen',
+    today: 'I dag', tomorrow: 'I morgen',
+
+    you_title: 'Hvem skal vi kontakte?',
+    you_sub: 'Vi bruker dette bare til denne bestillingen.',
+    vipps: 'Fyll ut med Vipps',
+    or_manual: 'eller fyll ut selv',
+    f_name: 'Fullt navn', f_phone: 'Mobilnummer', f_email: 'E-post', f_km: 'Kilometerstand (valgfritt)', f_comment: 'Noe mer vi bør vite? (valgfritt)',
+    f_sms: 'Send meg påminnelse på SMS dagen før',
+    f_required: 'Fyll ut navn, mobil og e-post',
+
+    confirm_title: 'Ser alt riktig ut?',
+    confirm_sub: 'Du betaler etter at jobben er gjort. Vi ringer alltid før vi gjør noe ekstra.',
+    edit: 'Endre',
+    sum_title: 'Din bestilling',
+    sum_empty: 'Ingen tjenester valgt ennå',
+    sum_total: 'Estimert pris',
+    sum_time: 'Estimert tid',
+    sum_vat: 'inkl. mva',
+    book_cta: 'Bekreft bestilling',
+    request_cta: 'Send bestilling',
+
+    done_title: 'Takk, {name}! Timen er bestilt.',
+    done_title_req: 'Takk, {name}! Vi har fått bestillingen.',
+    done_sub: 'Bekreftelse er sendt på SMS og e-post.',
+    done_sub_req: 'Vi bekrefter tidspunktet innen 2 timer i åpningstiden. Du får SMS.',
+    done_ref: 'Bestillingsnummer',
+    done_cal: 'Legg i kalender',
+    done_bring: 'Husk å ta med',
+    bring_wheels: 'Hjulene, bolter og eventuell låsenøkkel',
+    bring_key: 'Bilnøkkel og eventuelt servicehefte',
+    bring_charge: 'Ladekabel hvis du har problemer med lading',
+    done_change: 'Endre eller avbestill via lenken i SMS-en',
+    done_home: 'Til forsiden',
+
+    // Shop
+    pdp_fit_check: 'Passer dette på bilen din?',
+    pdp_fits: 'Passer {car}',
+    pdp_no_fit: 'Passer ikke {car} ({inch}" hjul)',
+    pdp_no_fit_cta: 'Se dekk som passer',
+    pdp_qty: 'Antall',
+    pdp_delivery: 'Hvordan vil du ha dem?',
+    pdp_pickup: 'Hent i butikk', pdp_pickup_sub: 'Klar i morgen',
+    pdp_ship: 'Send hjem', pdp_ship_sub: '2–4 dager',
+    pdp_fit: 'Monter hos oss', pdp_fit_sub: 'Vi monterer og balanserer',
+    pdp_hotel: 'Lagre sommerhjulene på dekkhotell',
+    pdp_buy_fit: 'Kjøp og velg monteringstid',
+    pdp_buy: 'Legg i handlekurv',
+    pdp_added: 'Lagt i handlekurven',
+    pdp_total: 'Totalt',
+    tyres_item: '{qty} × {name}',
+    fitting_item: 'Montering og balansering',
+  },
+
+  en: {
+    nav_workshop: 'Workshop', nav_tyres: 'Tyres', nav_shop: 'Shop', nav_locations: 'Locations', nav_book: 'Book a time',
+    proto_note: 'Prototype for Mjøsbil. Prices, times and vehicle data are examples.',
+
+    hero_kicker: 'Workshop · Tyres · Shop',
+    hero_title: 'Everything your car needs.<br>Booked in under a minute.',
+    hero_sub: 'Enter your plate number and we show what your car needs, what it costs and when we have a free slot.',
+    plate_placeholder: 'AB 12345',
+    hero_cta: 'Find a time',
+    hero_try: 'Try:',
+    usp_price: 'Fixed price before you book',
+    usp_ev: 'EV-certified mechanics',
+    usp_falck: 'Mobility guarantee with Falck',
+
+    intent_title: 'What do you need help with?',
+    i_service: 'Service', i_service_sub: 'Service and oil change',
+    i_eu: 'EU inspection', i_eu_sub: 'Periodic inspection',
+    i_tyre: 'Tyres and wheel change', i_tyre_sub: 'Wheel change and tyre hotel',
+    i_issue: 'Something is wrong', i_issue_sub: 'Noise, light or fault',
+    i_other: 'Other services', i_other_sub: 'AC, alignment, motorhome',
+
+    season_kicker: 'October',
+    season_title: 'Ready for winter wheels?',
+    season_text: 'Book a wheel change now and let your wheels stay in our tyre hotel. We have free slots this week.',
+    season_cta: 'Book wheel change',
+
+    ev_kicker: 'EV experts',
+    ev_title: 'EV service that looks after brakes and battery',
+    ev_text: 'EVs rarely use their mechanical brakes, and Norwegian salt and moisture make them rust. Our EV economy service includes high-voltage, charge port and 12V battery checks.',
+    ev_cta: 'See EV service',
+
+    eu_check_title: 'When is your EU inspection due?',
+    eu_check_text: 'Enter your plate number and we show the deadline and free slots.',
+    eu_check_cta: 'Check deadline',
+    eu_due_in: 'Due {date}',
+
+    shop_title: 'From the shop',
+    shop_sub: 'Buy tyres and parts and have them fitted by us in the same order.',
+    shop_fit: 'We can fit this',
+    shop_all: 'See the whole shop',
+
+    loc_title: 'Five workshops in Innlandet',
+    loc_sub: 'Gjøvik, Lillehammer, Dokka, Fåvang and Otta. Workshop, tyres and BilXtra shop in one place.',
+
+    step_car: 'Car', step_need: 'Needs', step_time: 'Place and time', step_you: 'Your details', step_confirm: 'Confirm',
+    back: 'Back', next: 'Next', continue: 'Continue',
+    car_title: 'Which car is it?',
+    car_sub: 'We fetch car details from the road authority, so you skip model and year.',
+    car_lookup: 'Find car',
+    car_found: 'We found your car',
+    car_not_you: 'Wrong car?',
+    car_ev: 'Electric', car_diesel: 'Diesel', car_petrol: 'Petrol', car_hybrid: 'Hybrid',
+    car_eu: 'EU inspection', car_last_service: 'Last service', car_wheels: 'Wheels',
+    car_eu_soon: 'Due soon',
+
+    need_title: 'What does the car need?',
+    need_sub: 'Pick what fits best. You can add more afterwards.',
+    need_for: 'For {car}',
+    recommended: 'Recommended for your car',
+    includes: 'What is included',
+    from: 'from',
+    price_quote: 'Price on request',
+    example_price: 'example price',
+    add: 'Add', added: 'Added', remove: 'Remove',
+    addons_title: 'Often booked together',
+    more_title: 'Does the car need anything else?',
+    more_cta: 'Add another service',
+    live: 'Confirmed slot',
+    request: 'We confirm the time',
+    mins: 'min', hours: 'h',
+    tyre_size: 'Wheel size from registration data: {inch}"',
+    tyre_hotel_note: 'Already have wheels in our tyre hotel? We find them by plate number.',
+    tyre_new: 'Need new tyres?',
+    tyre_new_cta: 'See winter tyres that fit',
+    tyre_season: 'per season',
+    eu_due_text: 'Your car is due for EU inspection by {date}.',
+    eu_due_soon_text: 'That is in {weeks} weeks. We have free slots before the deadline.',
+    issue_title: 'What do you notice?',
+    issue_sub: 'Pick the closest match. It helps the mechanic prepare.',
+    issue_desc: 'Describe briefly (optional)',
+    issue_desc_ph: 'E.g. "Engine light is on and the car hesitates uphill"',
+    issue_attach: 'Attach photo, video or sound',
+    issue_attached: 'attached',
+    issue_promise: 'We call you with an estimate before we repair anything.',
+    issue_suggest: 'Based on what you describe, this may also help:',
+
+    time_title: 'Where and when suits you?',
+    time_sub: 'We only show workshops that can do everything you picked.',
+    near: 'Near me', near_pick: 'I am closest to',
+    first_free: 'First free', km: 'km',
+    cant_do: 'Cannot do {service}',
+    pick_day: 'Pick a day', pick_time: 'Pick a time',
+    handover: 'How will you hand over the car?',
+    h_wait: 'I wait while you work', h_wait_sub: 'Coffee and wifi in the shop',
+    h_drop: 'I drop off and collect later', h_drop_sub: 'We text you when it is ready',
+    h_wait_long: 'Takes over 90 min, so we suggest dropping it off',
+    req_note: 'Some services need manual planning. Pick your preferred time and we confirm within 2 hours during opening hours.',
+    no_slots: 'Fully booked',
+    today: 'Today', tomorrow: 'Tomorrow',
+
+    you_title: 'Who should we contact?',
+    you_sub: 'We only use this for this booking.',
+    vipps: 'Fill in with Vipps',
+    or_manual: 'or fill in yourself',
+    f_name: 'Full name', f_phone: 'Mobile number', f_email: 'Email', f_km: 'Mileage (optional)', f_comment: 'Anything else we should know? (optional)',
+    f_sms: 'Text me a reminder the day before',
+    f_required: 'Please fill in name, mobile and email',
+
+    confirm_title: 'Does everything look right?',
+    confirm_sub: 'You pay after the job is done. We always call before doing anything extra.',
+    edit: 'Edit',
+    sum_title: 'Your booking',
+    sum_empty: 'No services selected yet',
+    sum_total: 'Estimated price',
+    sum_time: 'Estimated time',
+    sum_vat: 'incl. VAT',
+    book_cta: 'Confirm booking',
+    request_cta: 'Send booking',
+
+    done_title: 'Thanks, {name}! Your time is booked.',
+    done_title_req: 'Thanks, {name}! We have your booking.',
+    done_sub: 'Confirmation sent by text and email.',
+    done_sub_req: 'We confirm the time within 2 hours during opening hours. You will get a text.',
+    done_ref: 'Booking number',
+    done_cal: 'Add to calendar',
+    done_bring: 'Remember to bring',
+    bring_wheels: 'Your wheels, bolts and any locking key',
+    bring_key: 'Car key and any service book',
+    bring_charge: 'Charging cable if you have charging issues',
+    done_change: 'Change or cancel via the link in the text message',
+    done_home: 'Back to home',
+
+    pdp_fit_check: 'Does this fit your car?',
+    pdp_fits: 'Fits {car}',
+    pdp_no_fit: 'Does not fit {car} ({inch}" wheels)',
+    pdp_no_fit_cta: 'See tyres that fit',
+    pdp_qty: 'Quantity',
+    pdp_delivery: 'How do you want them?',
+    pdp_pickup: 'Pick up in store', pdp_pickup_sub: 'Ready tomorrow',
+    pdp_ship: 'Ship to me', pdp_ship_sub: '2–4 days',
+    pdp_fit: 'Fit at Mjøsbil', pdp_fit_sub: 'We fit and balance',
+    pdp_hotel: 'Store my summer wheels in the tyre hotel',
+    pdp_buy_fit: 'Buy and pick fitting time',
+    pdp_buy: 'Add to cart',
+    pdp_added: 'Added to cart',
+    pdp_total: 'Total',
+    tyres_item: '{qty} × {name}',
+    fitting_item: 'Fitting and balancing',
+  },
+};
+</script>
+<script>
+(function () {
+  const D = window.MB_DATA;
+  const I = window.MB_I18N;
+
+  // ---------- State ----------
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem('mb_' + k); return v == null ? d : v; } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem('mb_' + k, v); } catch (e) { /* storage unavailable */ } },
+  };
+  const S = {
+    lang: store.get('lang', 'no'),
+    car: null, plate: '', looking: false, euPlate: '', euCar: null,
+    presetIntent: null, after: null,
+    items: [],                 // [{id}] or custom {id, custom:true, name, price, mins, mode}
+    symptoms: [], issueText: '', attached: 0,
+    city: 'gjovik', loc: null, day: 0, slot: null, handover: 'drop',
+    contact: { name: '', phone: '', email: '', km: '', comment: '', sms: true }, err: '',
+    ref: null, cart: 0,
+    pdp: { qty: 4, delivery: 'fit', hotel: true, plate: '', car: null, looking: false },
+  };
+
+  // ---------- Helpers ----------
+  const t = (k, vars) => {
+    let s = (I[S.lang] && I[S.lang][k]) || I.no[k] || k;
+    if (vars) Object.keys(vars).forEach((v) => { s = s.replace('{' + v + '}', vars[v]); });
+    return s;
+  };
+  const L = (o) => (o && typeof o === 'object' && 'no' in o ? o[S.lang] || o.no : o);
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const kr = (n) => n.toLocaleString('nb-NO') + ' kr';
+  const locale = () => (S.lang === 'no' ? 'nb-NO' : 'en-GB');
+  const fmtDate = (d, opts) => d.toLocaleDateString(locale(), opts);
+  const dur = (m) => (m < 60 ? m + ' ' + t('mins') : Math.floor(m / 60) + ' ' + t('hours') + (m % 60 ? ' ' + (m % 60) + ' ' + t('mins') : ''));
+  const normPlate = (p) => p.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  const prettyPlate = (p) => { const n = normPlate(p); return n.replace(/^([A-Z]{2})(\d+)$/, '$1 $2'); };
+
+  function lookup(plate) {
+    const key = normPlate(plate);
+    if (key.length < 4) return null;
+    const c = D.cars[key] || Object.assign({}, D.cars._default);
+    return Object.assign({}, c, { plate: c.plate || prettyPlate(plate) });
+  }
+  const fuelName = (f) => t('car_' + f);
+  const weeksTo = (iso) => Math.round((new Date(iso) - new Date()) / (7 * 864e5));
+  const euSoon = (car) => weeksTo(car.euDue) <= 12;
+
+  function svc(item) {
+    if (item.custom) return item;
+    const s = D.services[item.id];
+    let price = s.price;
+    if (s.bySize && S.car) price = D.wheelPrice(S.car.wheel) + (s.hotel ? D.hotelPrice(S.car.wheel) : 0);
+    return Object.assign({ id: item.id }, s, { price });
+  }
+  const has = (id) => S.items.some((i) => i.id === id);
+  const fitsCar = (s) => {
+    const c = S.car; if (!c) return true;
+    if (s.fuel && s.fuel.indexOf(c.fuel) < 0) return false;
+    if (s.maxWeight && c.weight > s.maxWeight) return false;
+    if (s.minWeight && c.weight <= s.minWeight) return false;
+    return true;
+  };
+  const totals = () => S.items.reduce((a, i) => { const s = svc(i); a.price += s.price || 0; a.mins += s.mins || 0; if (s.from) a.from = true; if (s.mode === 'request') a.request = true; if (s.quote) a.quote = true; return a; }, { price: 0, mins: 0, from: false, request: false, quote: false });
+
+  function priceLabel(s) {
+    if (s.quote) return '<span>' + t('price_quote') + '</span>';
+    return (s.from ? '<small>' + t('from') + '</small>' : '') + kr(s.price) + (s.example ? '<small>' + t('example_price') + '</small>' : '') + (s.hotel ? '<small>' + t('tyre_season') + '</small>' : '');
+  }
+
+  // ---------- Icons ----------
+  const P = {
+    wrench: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L3 17.8V21h3.2l6.3-6.3a4 4 0 0 0 5.2-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/>',
+    shield: '<path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>',
+    tyre: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v5M12 16v5M3 12h5M16 12h5"/>',
+    alert: '<path d="M12 3l9.5 17h-19z"/><path d="M12 10v4M12 17.5v.5"/>',
+    dots: '<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',
+    car: '<path d="M3 16v-3l2-5a2 2 0 0 1 1.9-1.3h10.2A2 2 0 0 1 19 8l2 5v3"/><path d="M3 13h18M3 16h18v2h-3M6 18H3"/><circle cx="7" cy="16.5" r="1.5"/><circle cx="17" cy="16.5" r="1.5"/>',
+    bolt: '<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',
+    check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+    back: '<path d="M15 5l-7 7 7 7"/>',
+    right: '<path d="M9 5l7 7-7 7"/>',
+    pin: '<path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    cart: '<path d="M3 4h2l2.2 11h10.6L20 7H6.2"/><circle cx="9" cy="19.5" r="1.4"/><circle cx="17" cy="19.5" r="1.4"/>',
+    user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4.5-6 8-6s7 2 8 6"/>',
+    cal: '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+    sound: '<path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/>',
+    disc: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="2.5"/><path d="M6 6.5l3 3"/>',
+    steer: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="2"/><path d="M3.8 10.5L10 12M14 12l6.2-1.5M12 14v6.5"/>',
+    snow: '<path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9"/><path d="M9.5 4.5L12 6.5l2.5-2M9.5 19.5L12 17.5l2.5 2"/>',
+    key: '<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M14.5 8.5l2 2"/>',
+    info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.5v.5"/>',
+    camera: '<path d="M4 8h3l1.5-2.5h7L17 8h3v11H4z"/><circle cx="12" cy="13.5" r="3.5"/>',
+    x: '<path d="M6 6l12 12M18 6L6 18"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>',
+    minus: '<path d="M5 12h14"/>',
+    leaf: '<path d="M5 19c0-8 5-13 15-14-1 10-6 15-14 15"/><path d="M5 19l7-7"/>',
+    phone: '<path d="M5 3.5h4l1.5 4.5-2.5 1.5a11 11 0 0 0 6.5 6.5l1.5-2.5 4.5 1.5v4A2 2 0 0 1 18.5 21 15.5 15.5 0 0 1 3 5.5a2 2 0 0 1 2-2z"/>',
+    star: '<path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z"/>',
+  };
+  const ic = (n, s) => '<svg width="' + (s || 20) + '" height="' + (s || 20) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (P[n] || '') + '</svg>';
+
+  const INTENTS = [
+    { id: 'service', icon: 'wrench' }, { id: 'eu', icon: 'shield' }, { id: 'tyre', icon: 'tyre' },
+    { id: 'issue', icon: 'alert' }, { id: 'other', icon: 'dots' },
+  ];
+
+  // ---------- Router ----------
+  const route = () => (location.hash.replace(/^#/, '') || '/').split('?')[0];
+  const go = (h) => { if (location.hash === '#' + h) render(); else location.hash = h; };
+  window.addEventListener('hashchange', () => { render(); window.scrollTo(0, 0); });
+
+  // ---------- Shared chrome ----------
+  function header() {
+    return '<div class="ribbon">' + t('proto_note') + '</div>' +
+      '<header class="hdr"><div class="wrap">' +
+      '<a class="logo" href="#/" aria-label="Mjøsbil"><span class="logo-mark">' + ic('car', 16).replace('stroke="currentColor"', 'stroke="#fff"') + '</span>MJØSBIL</a>' +
+      '<nav class="nav"><a href="#/bestill/bil?i=service">' + t('nav_workshop') + '</a><a href="#/bestill/bil?i=tyre">' + t('nav_tyres') + '</a><a href="#/#shop">' + t('nav_shop') + '</a><a href="#/#locs">' + t('nav_locations') + '</a></nav>' +
+      '<div class="hdr-right">' +
+      '<div class="lang" role="group" aria-label="Language"><button data-a="lang" data-v="no" aria-pressed="' + (S.lang === 'no') + '">NO</button><button data-a="lang" data-v="en" aria-pressed="' + (S.lang === 'en') + '">EN</button></div>' +
+      '<button class="icon-btn" aria-label="Cart">' + ic('cart', 22) + (S.cart ? '<span class="badge-dot">' + S.cart + '</span>' : '') + '</button>' +
+      '<a class="btn btn-primary btn-sm" href="#/bestill/bil">' + t('nav_book') + '</a>' +
+      '</div></div></header>';
+  }
+  const footer = () => '<footer class="footer"><div class="wrap"><b style="color:var(--ink)">Mjøsbil AS</b><span>BilXtra verksted · Fagdekk · BilXtra butikk</span><span>' + t('proto_note') + '</span></div></footer>';
+
+  function plateInput(name, val, ph) {
+    return '<label class="plate"><span class="plate-eu"><span class="stars"></span>N</span><span class="sr">Reg.nr</span>' +
+      '<input data-in="' + name + '" value="' + esc(val) + '" placeholder="' + (ph || t('plate_placeholder')) + '" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="9" inputmode="text"></label>';
+  }
+  const tryPlates = (action) => '<div class="try">' + t('hero_try') + ' ' + ['EL 12345', 'DN 54321', 'BR 11223'].map((p) => '<button data-a="' + action + '" data-v="' + p + '"><span class="plate-chip">' + p + '</span></button>').join('') + '</div>';
+
+  // ---------- Illustrations ----------
+  const heroCar = '<svg class="hero-car" viewBox="0 0 520 220" fill="none" aria-hidden="true">' +
+    '<defs><linearGradient id="hc" x1="0" x2="1"><stop offset="0" stop-color="#00a9c2" stop-opacity=".9"/><stop offset="1" stop-color="#8fdbe6" stop-opacity=".5"/></linearGradient></defs>' +
+    '<ellipse cx="260" cy="196" rx="230" ry="12" fill="#000" opacity=".35"/>' +
+    '<path d="M40 160c0-22 10-34 34-40l58-14c26-26 62-46 120-46h62c40 0 76 18 104 44l46 8c22 4 32 18 32 38v14H40z" fill="#13252f" stroke="url(#hc)" stroke-width="2.5"/>' +
+    '<path d="M150 104c22-20 52-32 96-32h58c30 0 58 12 80 32z" fill="#0d1820" stroke="#2c4654" stroke-width="2"/>' +
+    '<path d="M262 72v32" stroke="#2c4654" stroke-width="2"/>' +
+    '<path d="M60 140h40M430 132h34" stroke="#8fdbe6" stroke-width="4" stroke-linecap="round"/>' +
+    '<circle cx="130" cy="170" r="30" fill="#0d1820" stroke="#3b5563" stroke-width="3"/><circle cx="130" cy="170" r="13" fill="#2c4654"/>' +
+    '<circle cx="396" cy="170" r="30" fill="#0d1820" stroke="#3b5563" stroke-width="3"/><circle cx="396" cy="170" r="13" fill="#2c4654"/>' +
+    '<path d="M0 196h520" stroke="#2c4654" stroke-dasharray="4 8"/></svg>';
+  const tyreArt = (size, dark) => '<svg width="' + size + '" height="' + size + '" viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="92" fill="' + (dark || '#1d2a33') + '"/>' +
+    Array.from({ length: 24 }, (_, i) => { const a = (i * 15) * Math.PI / 180; return '<rect x="96" y="6" width="8" height="18" rx="2" fill="#0d1820" transform="rotate(' + (i * 15) + ' 100 100)"/>'; }).join('') +
+    '<circle cx="100" cy="100" r="56" fill="#c9d1d6"/><circle cx="100" cy="100" r="46" fill="#e8ecef"/>' +
+    Array.from({ length: 5 }, (_, i) => '<rect x="95" y="58" width="10" height="34" rx="5" fill="#b5bfc5" transform="rotate(' + (i * 72) + ' 100 100)"/>').join('') +
+    '<circle cx="100" cy="100" r="12" fill="#8d999f"/></svg>';
+  const canArt = (size, c) => '<svg width="' + size + '" height="' + size + '" viewBox="0 0 200 200" aria-hidden="true"><rect x="52" y="40" width="96" height="140" rx="14" fill="' + c + '"/><rect x="70" y="22" width="34" height="22" rx="4" fill="#c9a227"/><rect x="62" y="84" width="76" height="52" rx="6" fill="#fff" opacity=".9"/><rect x="72" y="96" width="56" height="8" rx="4" fill="' + c + '"/><rect x="72" y="112" width="36" height="6" rx="3" fill="#9aa5ab"/></svg>';
+  const boxArt = (size, c) => '<svg width="' + size + '" height="' + size + '" viewBox="0 0 200 200" aria-hidden="true"><rect x="40" y="50" width="120" height="110" rx="14" fill="' + c + '"/><rect x="58" y="70" width="84" height="56" rx="8" fill="#ff8a3d" opacity=".85"/><path d="M66 140h68" stroke="#fff" stroke-width="6" stroke-linecap="round" opacity=".6"/></svg>';
+  const productArt = (id, size) => { const p = D.products[id]; return p.fitting === 'swap' ? tyreArt(size, p.color) : id === 'oil' ? canArt(size, p.color) : boxArt(size, p.color); };
+
+  // ---------- Home ----------
+  function home() {
+    const euRes = S.euCar ? (() => {
+      const w = weeksTo(S.euCar.euDue);
+      const d = fmtDate(new Date(S.euCar.euDue), { day: 'numeric', month: 'long', year: 'numeric' });
+      return '<div class="eu-result ' + (w > 12 ? 'ok' : '') + '">' + ic(w > 12 ? 'check' : 'alert') + '<span><b>' + esc(S.euCar.make + ' ' + S.euCar.model) + '</b> · ' + t('eu_due_in', { date: d }) + '</span><button class="btn btn-primary btn-sm" data-a="eu-book" style="margin-left:auto">' + t('nav_book') + '</button></div>';
+    })() : '';
+    return header() +
+      '<section class="hero"><div class="wrap"><div>' +
+      '<div class="kicker">' + t('hero_kicker') + '</div><h1>' + t('hero_title') + '</h1><p class="sub">' + t('hero_sub') + '</p>' +
+      '<form class="plate-row" data-form="hero">' + plateInput('plate', S.plate) + '<button class="btn btn-teal" type="submit">' + t('hero_cta') + ' ' + ic('right', 18) + '</button></form>' +
+      tryPlates('hero-try') +
+      '<div class="usps"><span>' + ic('check', 16) + t('usp_price') + '</span><span>' + ic('bolt', 16) + t('usp_ev') + '</span><span>' + ic('shield', 16) + t('usp_falck') + '</span></div>' +
+      '</div><div>' + heroCar + '</div></div></section>' +
+
+      '<section class="section"><div class="wrap"><div class="section-h"><h2>' + t('intent_title') + '</h2></div><div class="intents">' +
+      INTENTS.map((i) => '<button class="intent" data-a="home-intent" data-v="' + i.id + '"><span class="ico">' + ic(i.icon, 22) + '</span><span><b>' + t('i_' + i.id) + '</b><span>' + t('i_' + i.id + '_sub') + '</span></span></button>').join('') +
+      '</div></div></section>' +
+
+      '<section class="section" style="padding-top:0"><div class="wrap split">' +
+      '<div class="promo promo-winter"><span class="kicker">' + t('season_kicker') + '</span><h3>' + t('season_title') + '</h3><p class="muted">' + t('season_text') + '</p><button class="btn btn-primary" data-a="home-intent" data-v="tyre">' + t('season_cta') + '</button><div class="promo-art" style="opacity:.18">' + tyreArt(220) + '</div></div>' +
+      '<div class="promo promo-ev"><span class="kicker">' + ic('bolt', 14) + ' ' + t('ev_kicker') + '</span><h3>' + t('ev_title') + '</h3><p>' + t('ev_text') + '</p><button class="btn btn-light" data-a="home-ev">' + t('ev_cta') + '</button></div>' +
+      '</div></section>' +
+
+      '<section class="section" style="padding-top:0"><div class="wrap"><div class="eu-check"><div><h3 style="font-size:22px">' + t('eu_check_title') + '</h3><p class="muted" style="margin-top:6px">' + t('eu_check_text') + '</p></div>' +
+      '<form class="plate-row" data-form="eu">' + plateInput('euPlate', S.euPlate) + '<button class="btn btn-primary" type="submit">' + t('eu_check_cta') + '</button></form>' + euRes + '</div></div></section>' +
+
+      '<section class="section" id="shop" style="padding-top:0"><div class="wrap"><div class="section-h"><div><h2>' + t('shop_title') + '</h2><p class="muted">' + t('shop_sub') + '</p></div><a class="link" href="#/produkt/hakka10">' + t('shop_all') + ' →</a></div><div class="products">' +
+      Object.keys(D.products).map((id) => { const p = D.products[id]; return '<a class="pcard" href="#/produkt/' + id + '"><div class="pimg">' + productArt(id, 130) + '</div><div class="pbody"><span class="brand">' + esc(p.brand) + '</span><span class="name">' + esc(p.name) + '</span><span class="muted" style="font-size:13px">' + esc(p.spec) + '</span><span class="price">' + kr(p.price) + ' <span class="muted" style="font-weight:500;font-size:13px">' + L(p.unit) + '</span></span>' + (p.fitting ? '<span class="tag tag-teal">' + ic('wrench', 12) + t('shop_fit') + '</span>' : '') + '</div></a>'; }).join('') +
+      '</div></div></section>' +
+
+      '<section class="section" id="locs" style="padding-top:0"><div class="wrap"><div class="section-h"><div><h2>' + t('loc_title') + '</h2><p class="muted">' + t('loc_sub') + '</p></div></div><div class="locs">' +
+      D.locations.map((l) => '<div class="loc-row"><span class="pin">' + ic('pin') + '</span><div><b>' + esc(l.name) + '</b><div class="meta">' + t('first_free') + ': ' + firstFreeLabel(l) + '</div></div><a class="btn btn-ghost btn-sm" href="#/bestill/bil" data-a="pick-city" data-v="' + l.id + '">' + t('nav_book') + '</a></div>').join('') +
+      '</div></div></section>' + footer();
+  }
+
+  // ---------- Availability (mock, deterministic) ----------
+  const SLOT_TIMES = ['08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '12:00', '12:30', '13:00', '13:30', '14:00'];
+  function workdays(n) {
+    const out = []; const d = new Date(); d.setHours(12, 0, 0, 0);
+    while (out.length < n) { d.setDate(d.getDate() + 1); if (d.getDay() !== 0 && d.getDay() !== 6) out.push(new Date(d)); }
+    return out;
+  }
+  const DAYS = workdays(12);
+  function slotsFor(loc, dayIdx) {
+    const r = (loc.seed * 31 + dayIdx * 17) % 11;
+    if (r === 0 && dayIdx < 3) return SLOT_TIMES.map(() => false); // a fully booked day
+    return SLOT_TIMES.map((_, i) => ((loc.seed + i * 7 + dayIdx * 5) % 10) > (dayIdx < 2 ? 6 : 3));
+  }
+  function firstFree(loc) {
+    for (let d = 0; d < DAYS.length; d++) { const s = slotsFor(loc, d); const i = s.indexOf(true); if (i >= 0) return { d, time: SLOT_TIMES[i] }; }
+    return null;
+  }
+  function dayLabel(i) {
+    if (i === 0 && (DAYS[0] - new Date()) < 2 * 864e5) return t('tomorrow');
+    return fmtDate(DAYS[i], { weekday: 'short', day: 'numeric', month: 'short' });
+  }
+  const firstFreeLabel = (loc) => { const f = firstFree(loc); return f ? dayLabel(f.d) + ' ' + f.time : '–'; };
+
+  // ---------- Booking ----------
+  const STEPS = ['bil', 'behov', 'tid', 'deg', 'bekreft'];
+  const STEP_LBL = { bil: 'step_car', behov: 'step_need', tid: 'step_time', deg: 'step_you', bekreft: 'step_confirm' };
+  function stepper(cur) {
+    const ci = STEPS.indexOf(cur);
+    return '<div class="stepper" aria-label="Progress">' + STEPS.map((s, i) => '<div class="s ' + (i < ci ? 'past' : i === ci ? 'on' : '') + '"><div class="bar"></div><span class="lbl">' + t(STEP_LBL[s]) + '</span></div>').join('') + '</div>';
+  }
+
+  function carCard(compact) {
+    const c = S.car; if (!c) return '';
+    const due = fmtDate(new Date(c.euDue), { day: 'numeric', month: 'short', year: 'numeric' });
+    return '<div class="card car-card"><div class="car-top"><div class="car-ico">' + ic(c.fuel === 'ev' ? 'bolt' : 'car', 26) + '</div><div style="flex:1;min-width:0"><span class="plate-chip">' + esc(c.plate) + '</span><div class="car-name" style="margin-top:6px">' + esc(c.make + ' ' + c.model) + '</div><div class="muted" style="font-size:14px">' + c.year + ' · ' + fuelName(c.fuel) + ' · ' + c.weight.toLocaleString('nb-NO') + ' kg</div></div>' +
+      (compact ? '<button class="link" data-a="car-reset">' + t('car_not_you') + '</button>' : '') + '</div>' +
+      (compact ? '' : '<div class="car-facts"><div class="fact"><small>' + t('car_eu') + '</small><b>' + due + '</b>' + (euSoon(c) ? ' <span class="tag tag-amber">' + t('car_eu_soon') + '</span>' : '') + '</div><div class="fact"><small>' + t('car_last_service') + '</small><b>' + L(c.lastService) + '</b></div><div class="fact"><small>' + t('car_wheels') + '</small><b>' + c.wheel + '"</b></div></div>') +
+      '</div>';
+  }
+
+  function stepCar() {
+    const found = S.car && !S.looking;
+    return '<div class="step-h"><h1>' + t('car_title') + '</h1><p class="muted">' + t('car_sub') + '</p></div>' +
+      (found ? '<div class="stack"><div class="note">' + ic('check') + '<span><b>' + t('car_found') + '</b></span></div>' + carCard(false) + '<div><button class="link" data-a="car-reset">' + t('car_not_you') + '</button></div></div>'
+        : '<form class="plate-row" data-form="car">' + plateInput('plate', S.plate) + '<button class="btn btn-primary" type="submit">' + t('car_lookup') + '</button></form>' + (S.looking ? '<div class="lookup-anim"></div>' : tryPlates('car-try')));
+  }
+
+  function stepNeed() {
+    const counts = {};
+    S.items.forEach((i) => { const c = svc(i).cat; const k = c === 'addon' ? null : c; if (k) counts[k] = (counts[k] || 0) + 1; });
+    const nudges = [];
+    if (S.car && euSoon(S.car)) nudges.push('<div class="note amber">' + ic('alert') + '<span>' + t('eu_due_text', { date: fmtDate(new Date(S.car.euDue), { day: 'numeric', month: 'long' }) }) + ' ' + t('eu_due_soon_text', { weeks: weeksTo(S.car.euDue) }) + '</span></div>');
+    return '<div class="step-h"><h1>' + (S.items.length ? t('more_title') : t('need_title')) + '</h1><p class="muted">' + t('need_sub') + '</p></div>' +
+      '<div class="stack">' + carCard(true) + nudges.join('') +
+      '<div class="grid-intents">' + INTENTS.map((i) => '<button class="intent ' + (counts[i.id] ? 'selected' : '') + '" data-a="intent" data-v="' + i.id + '"><span class="ico">' + ic(i.icon, 22) + '</span><span><b>' + t('i_' + i.id) + '</b><span>' + t('i_' + i.id + '_sub') + '</span></span>' + (counts[i.id] ? '<span class="tag tag-dark count">' + ic('check', 12) + counts[i.id] + '</span>' : '') + '</button>').join('') + '</div></div>';
+  }
+
+  function optCard(id, recommended, single) {
+    const s = svc({ id }); const on = has(id);
+    const incl = L(s.incl);
+    return '<button class="opt ' + (on ? 'on' : '') + '" data-a="toggle" data-v="' + id + '" data-single="' + (single ? s.cat : '') + '" aria-pressed="' + on + '">' +
+      '<div class="opt-top"><span class="opt-check">' + (on ? ic('check', 16) : '') + '</span><span class="opt-title">' + esc(L(s.name)) + '</span><span class="opt-price">' + priceLabel(s) + '</span></div>' +
+      '<div class="opt-desc">' + esc(L(s.desc)) + '</div>' +
+      '<div class="opt-meta">' + (recommended ? '<span class="tag tag-teal">' + ic('star', 12) + t('recommended') + '</span>' : '') + '<span class="tag">' + ic('clock', 12) + dur(s.mins) + '</span>' + (s.mode === 'live' ? '<span class="tag tag-green">' + ic('cal', 12) + t('live') + '</span>' : '<span class="tag tag-amber">' + ic('phone', 12) + t('request') + '</span>') + '</div>' +
+      (on && incl ? '<div class="opt-incl">' + incl.map((x) => '<div>' + ic('check', 14) + '<span>' + esc(x) + '</span></div>').join('') + '</div>' : '') +
+      '</button>';
+  }
+
+  function addonList(mainIds) {
+    const ids = [];
+    mainIds.forEach((m) => (D.addons[m] || []).forEach((a) => { if (ids.indexOf(a) < 0 && mainIds.indexOf(a) < 0 && fitsCar(D.services[a])) ids.push(a); }));
+    if (!ids.length) return '';
+    return '<div class="sub-h">' + t('addons_title') + '</div><div class="addons">' + ids.slice(0, 3).map((id) => {
+      const s = svc({ id }); const on = has(id);
+      return '<button class="addon ' + (on ? 'on' : '') + '" data-a="toggle" data-v="' + id + '"><span class="t"><b>' + esc(L(s.name)) + '</b><span>' + esc(L(s.desc)) + '</span></span><span class="p">+ ' + (s.from ? t('from') + ' ' : '') + kr(s.price) + '</span><span class="btn btn-sm ' + (on ? 'btn-primary' : 'btn-ghost') + '">' + (on ? ic('check', 14) : ic('plus', 14)) + '</span></button>';
+    }).join('') + '</div>';
+  }
+
+  function stepIntent(cat) {
+    const c = S.car;
+    let body = '';
+    const head = '<button class="back-btn" data-a="nav" data-v="/bestill/behov">' + ic('back', 16) + t('back') + '</button>' +
+      '<div class="step-h"><h1>' + t('i_' + cat) + '</h1><p class="muted">' + t('need_for', { car: esc(c.make + ' ' + c.model) }) + '</p></div>';
+    const pick = (ids, rec, single) => ids.filter((id) => fitsCar(D.services[id])).map((id) => optCard(id, id === rec, single)).join('');
+    const selMain = (ids) => ids.filter(has);
+
+    if (cat === 'service') {
+      const ids = c.fuel === 'ev' ? ['ev_eco_brk', 'ev_eco', 'maker'] : ['maker', 'eco20', 'oil'];
+      const rec = c.fuel === 'ev' ? 'ev_eco_brk' : (c.year < 2020 ? 'eco20' : 'maker');
+      body = '<div class="opts">' + pick(ids, rec, true) + '</div>' + addonList(selMain(ids));
+    } else if (cat === 'eu') {
+      const ids = ['pkk', 'pkk_heavy', 'recheck'];
+      const due = fmtDate(new Date(c.euDue), { day: 'numeric', month: 'long', year: 'numeric' });
+      body = '<div class="note ' + (euSoon(c) ? 'amber' : '') + '">' + ic('cal') + '<span>' + t('eu_due_text', { date: due }) + (euSoon(c) ? ' ' + t('eu_due_soon_text', { weeks: weeksTo(c.euDue) }) : '') + '</span></div>' +
+        '<div class="opts">' + pick(ids, c.weight > 3500 ? 'pkk_heavy' : 'pkk', true) + '</div>' + addonList(selMain(ids));
+    } else if (cat === 'tyre') {
+      const ids = ['hotel', 'swap'];
+      body = '<div class="note">' + ic('tyre') + '<span>' + t('tyre_size', { inch: c.wheel }) + '. ' + t('tyre_hotel_note') + '</span></div>' +
+        '<div class="opts">' + pick(ids, 'hotel', true) + '</div>' + addonList(selMain(ids)) +
+        '<div class="card" style="padding:16px;display:flex;gap:12px;align-items:center"><div style="flex:1"><b>' + t('tyre_new') + '</b></div><a class="btn btn-ghost btn-sm" href="#/produkt/' + (c.wheel <= 16 ? 'hakka10' : 'hakka10') + '">' + t('tyre_new_cta') + '</a></div>';
+    } else if (cat === 'issue') {
+      const syms = D.symptoms.filter((s) => !s.fuel || s.fuel.indexOf(c.fuel) >= 0);
+      const sugg = S.symptoms.map((id) => (D.symptoms.find((x) => x.id === id) || {}).suggest).filter(Boolean).filter((v, i, a) => a.indexOf(v) === i);
+      body = '<div class="sub-h" style="margin-top:0">' + t('issue_title') + '</div><p class="muted" style="margin-top:-8px">' + t('issue_sub') + '</p>' +
+        '<div class="symptoms">' + syms.map((s) => '<button class="sym ' + (S.symptoms.indexOf(s.id) >= 0 ? 'on' : '') + '" data-a="sym" data-v="' + s.id + '"><span class="ico">' + ic(s.icon) + '</span>' + esc(L(s.name)) + '</button>').join('') + '</div>' +
+        (S.symptoms.length ? '<div class="field"><label for="issue">' + t('issue_desc') + '</label><textarea id="issue" data-in="issueText" placeholder="' + esc(t('issue_desc_ph')) + '">' + esc(S.issueText) + '</textarea></div>' +
+          '<button class="attach" data-a="attach">' + ic('camera') + '<span>' + t('issue_attach') + (S.attached ? ' · <b>' + S.attached + ' ' + t('issue_attached') + '</b>' : '') + '</span></button>' +
+          '<div class="opts">' + optCard('diag', true, false) + '</div>' +
+          '<div class="note">' + ic('phone') + '<span>' + t('issue_promise') + '</span></div>' +
+          (sugg.length ? '<div class="sub-h">' + t('issue_suggest') + '</div><div class="opts">' + sugg.map((id) => optCard(id, false, false)).join('') + '</div>' : '') : '');
+    } else if (cat === 'other') {
+      body = '<div class="opts">' + pick(['ac', 'align', 'flush', 'rv'], c.weight > 3500 ? 'rv' : null, false) + '</div>';
+    }
+    return head + '<div class="stack">' + body + '</div>';
+  }
+
+  function unavailableAt(loc) { return S.items.map((i) => i.id).filter((id) => loc.no.indexOf(id) >= 0); }
+
+  function stepTime() {
+    const locs = D.locations.slice().sort((a, b) => a.km[S.city] - b.km[S.city]);
+    if (!S.loc || unavailableAt(D.locations.find((l) => l.id === S.loc)).length) {
+      const first = locs.find((l) => !unavailableAt(l).length); S.loc = first ? first.id : null; S.slot = null;
+    }
+    const loc = D.locations.find((l) => l.id === S.loc);
+    const tot = totals();
+    const canWait = tot.mins <= 90;
+    if (!canWait && S.handover === 'wait') S.handover = 'drop';
+    const slots = loc ? slotsFor(loc, S.day) : [];
+    return '<div class="step-h"><h1>' + t('time_title') + '</h1><p class="muted">' + t('time_sub') + '</p></div><div class="stack">' +
+      '<div><div class="muted" style="font-size:13px;margin-bottom:8px">' + ic('pin', 14).replace('<svg', '<svg style="display:inline;vertical-align:-2px"') + ' ' + t('near_pick') + '</div><div class="loc-pick">' +
+      D.locations.map((l) => '<button class="chip ' + (S.city === l.id ? 'on' : '') + '" data-a="city" data-v="' + l.id + '">' + esc(l.area === 'Hunndalen' ? 'Gjøvik' : l.area) + '</button>').join('') + '</div></div>' +
+      '<div class="loc-list">' + locs.map((l) => {
+        const no = unavailableAt(l); const ff = firstFree(l);
+        return '<button class="loc ' + (S.loc === l.id ? 'on' : '') + '" data-a="loc" data-v="' + l.id + '" ' + (no.length ? 'disabled' : '') + '><span class="radio"></span><span class="t"><b>' + esc(l.name) + '</b><span>' + (no.length ? t('cant_do', { service: esc(L(svc({ id: no[0] }).name).toLowerCase()) }) : l.km[S.city] + ' ' + t('km') + ' · ' + esc(l.area)) + '</span></span>' +
+          (no.length || !ff ? '' : '<span class="first">' + t('first_free') + '<b>' + dayLabel(ff.d) + ' ' + ff.time + '</b></span>') + '</button>';
+      }).join('') + '</div>' +
+      (loc ? '<div class="sub-h">' + t('pick_day') + '</div><div class="days">' + DAYS.map((d, i) => {
+        const free = slotsFor(loc, i).filter(Boolean).length;
+        return '<button class="day ' + (S.day === i ? 'on' : '') + (free ? '' : ' full') + '" data-a="day" data-v="' + i + '"><small>' + fmtDate(d, { weekday: 'short' }) + '</small><b>' + d.getDate() + '</b><span class="dots">' + (free ? free + ' ' + (S.lang === 'no' ? 'ledige' : 'free') : t('no_slots')) + '</span></button>';
+      }).join('') + '</div>' +
+        '<div class="sub-h">' + t('pick_time') + '</div>' + (slots.some(Boolean) ? '<div class="slots">' + SLOT_TIMES.map((tm, i) => '<button class="slot ' + (S.slot === tm ? 'on' : '') + '" data-a="slot" data-v="' + tm + '" ' + (slots[i] ? '' : 'disabled') + '>' + tm + '</button>').join('') + '</div>' : '<p class="muted">' + t('no_slots') + '</p>') +
+        (tot.request ? '<div class="note amber">' + ic('info') + '<span>' + t('req_note') + '</span></div>' : '') +
+        '<div class="sub-h">' + t('handover') + '</div><div class="radios">' +
+        '<button class="radio-row ' + (S.handover === 'drop' ? 'on' : '') + '" data-a="handover" data-v="drop"><span class="radio"></span><span><b>' + t('h_drop') + '</b><span>' + t('h_drop_sub') + '</span></span></button>' +
+        '<button class="radio-row ' + (S.handover === 'wait' ? 'on' : '') + '" data-a="handover" data-v="wait" ' + (canWait ? '' : 'disabled') + '><span class="radio"></span><span><b>' + t('h_wait') + '</b><span>' + (canWait ? t('h_wait_sub') : t('h_wait_long')) + '</span></span></button>' +
+        '</div>' : '') + '</div>';
+  }
+
+  function stepYou() {
+    const c = S.contact;
+    const f = (k, type, ph, mode) => '<div class="field"><label for="f_' + k + '">' + t('f_' + k) + '</label><input class="input" id="f_' + k + '" type="' + type + '" data-in="contact.' + k + '" value="' + esc(c[k]) + '"' + (ph ? ' placeholder="' + ph + '"' : '') + (mode ? ' inputmode="' + mode + '"' : '') + '></div>';
+    return '<div class="step-h"><h1>' + t('you_title') + '</h1><p class="muted">' + t('you_sub') + '</p></div><div class="form">' +
+      '<button class="btn vipps btn-block" data-a="vipps">' + t('vipps') + '</button><div class="divider">' + t('or_manual') + '</div>' +
+      f('name', 'text', '', '') + f('phone', 'tel', '', 'tel') + f('email', 'email', '', 'email') + f('km', 'text', '', 'numeric') +
+      '<div class="field"><label for="f_comment">' + t('f_comment') + '</label><textarea id="f_comment" data-in="contact.comment">' + esc(c.comment) + '</textarea></div>' +
+      '<label class="check"><input type="checkbox" data-in="contact.sms" ' + (c.sms ? 'checked' : '') + '>' + t('f_sms') + '</label>' +
+      (S.err ? '<div class="err">' + S.err + '</div>' : '') + '</div>';
+  }
+
+  function whenText() {
+    if (!S.slot) return '';
+    return fmtDate(DAYS[S.day], { weekday: 'long', day: 'numeric', month: 'long' }) + ' ' + S.slot;
+  }
+  function stepConfirm() {
+    const loc = D.locations.find((l) => l.id === S.loc);
+    const row = (icon, label, val, step) => '<div class="review-row"><span class="ico">' + ic(icon) + '</span><div class="t"><small>' + label + '</small>' + val + '</div>' + (step ? '<button class="link" data-a="nav" data-v="/bestill/' + step + '">' + t('edit') + '</button>' : '') + '</div>';
+    return '<div class="step-h"><h1>' + t('confirm_title') + '</h1><p class="muted">' + t('confirm_sub') + '</p></div>' +
+      '<div class="card review">' +
+      row('car', t('step_car'), esc(S.car.make + ' ' + S.car.model) + ' · <span class="plate-chip">' + esc(S.car.plate) + '</span>', 'bil') +
+      row('wrench', t('step_need'), S.items.map((i) => esc(L(svc(i).name))).join('<br>'), 'behov') +
+      row('pin', t('step_time'), esc(loc.name) + '<br>' + whenText() + '<br><span class="muted">' + (S.handover === 'wait' ? t('h_wait') : t('h_drop')) + '</span>', 'tid') +
+      row('user', t('step_you'), esc(S.contact.name) + '<br>' + esc(S.contact.phone) + ' · ' + esc(S.contact.email), 'deg') +
+      '</div>';
+  }
+
+  function summaryInner(primary) {
+    const tot = totals();
+    const loc = S.loc && D.locations.find((l) => l.id === S.loc);
+    return '<div class="card sum-card"><h3>' + t('sum_title') + '</h3>' +
+      (S.car ? '<div style="display:flex;gap:8px;align-items:center;font-size:14px"><span class="plate-chip">' + esc(S.car.plate) + '</span><span class="muted">' + esc(S.car.make + ' ' + S.car.model) + '</span></div>' : '') +
+      '<div class="sum-items">' + (S.items.length ? S.items.map((i, idx) => { const s = svc(i); return '<div class="sum-item"><span class="n">' + esc(L(s.name)) + '</span><b>' + (s.quote ? '–' : (s.from ? t('from') + ' ' : '') + kr(s.price)) + '</b><button class="x" data-a="remove" data-v="' + idx + '" aria-label="' + t('remove') + '">' + ic('x', 14) + '</button></div>'; }).join('') : '<span class="muted" style="font-size:14px">' + t('sum_empty') + '</span>') + '</div>' +
+      (S.items.length ? '<div class="sum-meta">' + '<div>' + ic('clock', 16) + t('sum_time') + ': ' + dur(tot.mins) + '</div>' + (loc ? '<div>' + ic('pin', 16) + esc(loc.name) + '</div>' : '') + (S.slot ? '<div>' + ic('cal', 16) + whenText() + '</div>' : '') + '</div>' +
+        '<div class="sum-tot"><span>' + t('sum_total') + '<br><span class="muted" style="font-size:12px">' + t('sum_vat') + '</span></span><b>' + (tot.from ? '<span style="font-size:14px;font-weight:500">' + t('from') + ' </span>' : '') + kr(tot.price) + '</b></div>' : '') +
+      primary + '</div>';
+  }
+
+  function primaryFor(step) {
+    const tot = totals();
+    if (step === 'behov' || step === 'intent') return { label: t('next'), ok: S.items.length > 0, a: 'to-time' };
+    if (step === 'tid') return { label: t('next'), ok: !!(S.loc && S.slot), a: 'to-you' };
+    if (step === 'deg') return { label: t('next'), ok: true, a: 'to-confirm' };
+    if (step === 'bekreft') return { label: tot.request ? t('request_cta') : t('book_cta'), ok: true, a: 'submit' };
+    return null;
+  }
+
+  function booking(sub, extra) {
+    if (!S.car && sub !== 'bil') { go('/bestill/bil'); return ''; }
+    if (sub === 'ferdig') return header() + doneView() + footer();
+    if ((sub === 'tid' || sub === 'deg' || sub === 'bekreft') && !S.items.length) { go('/bestill/behov'); return ''; }
+    if ((sub === 'deg' || sub === 'bekreft') && !S.slot) { go('/bestill/tid'); return ''; }
+    if (sub === 'bekreft' && !validContact()) { go('/bestill/deg'); return ''; }
+    const stepKey = sub === 'behov' && extra ? 'intent' : sub;
+    let body = '';
+    if (sub === 'bil') body = stepCar();
+    else if (sub === 'behov') body = extra ? stepIntent(extra) : stepNeed();
+    else if (sub === 'tid') body = stepTime();
+    else if (sub === 'deg') body = stepYou();
+    else if (sub === 'bekreft') body = stepConfirm();
+
+    let primary = null;
+    if (sub === 'bil' && S.car && !S.looking) primary = { label: t('continue'), ok: true, a: 'to-need' };
+    else primary = primaryFor(stepKey);
+    const pBtn = primary ? '<button class="btn btn-primary btn-block" data-a="' + primary.a + '" ' + (primary.ok ? '' : 'disabled') + '>' + primary.label + '</button>' : '';
+    const showSide = sub !== 'bil';
+    const tot = totals();
+    const mbar = primary ? '<div class="mbar ' + (showSide ? 'has-side' : '') + '"><div class="tot">' + (S.items.length ? '<small>' + S.items.length + ' × · ' + dur(tot.mins) + '</small><b>' + (tot.from ? '<span style="font-size:13px;font-weight:500">' + t('from') + ' </span>' : '') + kr(tot.price) + '</b>' : (S.car ? '<small>' + esc(S.car.plate) + '</small><b style="font-size:15px">' + esc(S.car.make + ' ' + S.car.model) + '</b>' : '')) + '</div><button class="btn btn-primary" data-a="' + primary.a + '" ' + (primary.ok ? '' : 'disabled') + '>' + primary.label + '</button></div>' : '';
+    const backTo = { behov: '/bestill/bil', tid: '/bestill/behov', deg: '/bestill/tid', bekreft: '/bestill/deg' }[sub];
+    return header() + '<main class="book"><div class="wrap"><div class="main">' + stepper(sub) +
+      (backTo && !(sub === 'behov' && extra) ? '<button class="back-btn" data-a="nav" data-v="' + backTo + '">' + ic('back', 16) + t('back') + '</button>' : '') +
+      body + '</div>' + (showSide ? '<aside class="summary">' + summaryInner(pBtn) + '</aside>' : '') + '</div></main>' + mbar;
+  }
+
+  function validContact() { const c = S.contact; return c.name.trim() && c.phone.trim() && /\S+@\S+/.test(c.email); }
+
+  function doneView() {
+    if (!S.ref) { go('/'); return ''; }
+    const loc = D.locations.find((l) => l.id === S.loc);
+    const tot = totals();
+    const first = esc(S.contact.name.split(' ')[0]);
+    const bring = [t('bring_key')];
+    if (S.items.some((i) => i.id === 'swap' || i.id === 'hotel')) bring.unshift(t('bring_wheels'));
+    if (S.car.fuel === 'ev' && S.symptoms.indexOf('charge') >= 0) bring.push(t('bring_charge'));
+    return '<main class="book"><div class="wrap" style="display:block"><div class="done">' +
+      '<div class="done-ico">' + ic('check', 36) + '</div><h1>' + (tot.request ? t('done_title_req', { name: first }) : t('done_title', { name: first })) + '</h1><p class="muted">' + (tot.request ? t('done_sub_req') : t('done_sub')) + '</p>' +
+      '<div><small class="muted">' + t('done_ref') + '</small><div class="ref">' + S.ref + '</div></div>' +
+      '<div class="card review done-card">' +
+      '<div class="review-row"><span class="ico">' + ic('cal') + '</span><div class="t"><small>' + t('step_time') + '</small><b>' + whenText() + '</b><br>' + esc(loc.name) + ' · ' + esc(loc.addr) + '</div></div>' +
+      '<div class="review-row"><span class="ico">' + ic('wrench') + '</span><div class="t"><small>' + t('step_need') + '</small>' + S.items.map((i) => esc(L(svc(i).name))).join('<br>') + '<br><b>' + t('sum_total') + ': ' + (tot.from ? t('from') + ' ' : '') + kr(tot.price) + '</b></div></div>' +
+      '<div class="review-row"><span class="ico">' + ic('info') + '</span><div class="t"><small>' + t('done_bring') + '</small>' + bring.map(esc).join('<br>') + '</div></div>' +
+      '</div>' +
+      '<div class="done-actions"><button class="btn btn-ghost" data-a="toast" data-v="' + esc(t('done_cal')) + ' ✓">' + ic('cal', 18) + t('done_cal') + '</button><button class="btn btn-primary" data-a="restart">' + t('done_home') + '</button></div>' +
+      '<p class="muted" style="font-size:14px">' + t('done_change') + '</p>' +
+      '</div></div></main>';
+  }
+
+  // ---------- Product page ----------
+  function pdp(id) {
+    const p = D.products[id] || D.products.hakka10;
+    const st = S.pdp; const car = st.car || S.car;
+    const isTyre = p.fitting === 'swap';
+    let fitRes = '';
+    if (car && isTyre) {
+      fitRes = car.wheel === p.fitsInch
+        ? '<div class="fit-res ok">' + ic('check') + t('pdp_fits', { car: esc(car.make + ' ' + car.model) }) + '</div>'
+        : '<div class="fit-res no">' + ic('alert') + t('pdp_no_fit', { car: esc(car.make + ' ' + car.model), inch: car.wheel }) + '</div>';
+    }
+    const fitPrice = isTyre ? D.wheelPrice(p.fitsInch) : 0;
+    const total = p.price * st.qty + (isTyre && st.delivery === 'fit' ? fitPrice + (st.hotel ? D.hotelPrice(p.fitsInch) : 0) : 0);
+    const radio = (v, title, sub, extra) => '<button class="radio-row ' + (st.delivery === v ? 'on' : '') + '" data-a="pdp-del" data-v="' + v + '"><span class="radio"></span><span style="flex:1"><b>' + title + '</b><span>' + sub + '</span></span>' + (extra ? '<b style="font-size:14px">' + extra + '</b>' : '') + '</button>';
+    return header() + '<main class="pdp"><div class="wrap">' +
+      '<nav class="crumbs"><a href="#/">Mjøsbil</a>/<a href="#/#shop">' + t('nav_shop') + '</a>/<span>' + L(p.cat) + '</span></nav>' +
+      '<div class="pdp-img">' + productArt(id, 300) + '</div>' +
+      '<div class="pdp-info"><div><div class="muted" style="font-weight:600;text-transform:uppercase;font-size:13px;letter-spacing:.04em">' + esc(p.brand) + '</div><h1>' + esc(p.name) + '</h1><div class="muted">' + esc(p.spec) + ' · ' + L(p.cat) + '</div></div>' +
+      '<div class="pdp-price">' + kr(p.price) + ' <small>' + L(p.unit) + (p.example ? ' · ' + t('example_price') : '') + '</small></div>' +
+      '<div class="bullets">' + L(p.bullets).map((b) => '<div>' + ic('check', 16) + '<span>' + esc(b) + '</span></div>').join('') + '</div>' +
+      (isTyre ? '<div class="card fit-box"><b>' + t('pdp_fit_check') + '</b>' + (car ? fitRes : '<form class="plate-row" data-form="pdp">' + plateInput('pdpPlate', st.plate) + '<button class="btn btn-primary" type="submit">' + t('car_lookup') + '</button></form>' + tryPlates('pdp-try')) + '</div>' : '') +
+      '<div style="display:flex;align-items:center;gap:12px"><span class="muted">' + t('pdp_qty') + '</span><div class="qty"><button data-a="qty" data-v="-1" aria-label="-">' + ic('minus', 18) + '</button><span>' + st.qty + '</span><button data-a="qty" data-v="1" aria-label="+">' + ic('plus', 18) + '</button></div></div>' +
+      (isTyre ? '<div class="sub-h">' + t('pdp_delivery') + '</div><div class="radios">' +
+        radio('fit', t('pdp_fit'), t('pdp_fit_sub') + ' · ' + t('first_free') + ' ' + firstFreeLabel(D.locations[0]), '+ ' + kr(fitPrice)) +
+        radio('pickup', t('pdp_pickup'), t('pdp_pickup_sub')) + radio('ship', t('pdp_ship'), t('pdp_ship_sub')) + '</div>' +
+        (st.delivery === 'fit' ? '<label class="check"><input type="checkbox" data-in="pdp.hotel" ' + (st.hotel ? 'checked' : '') + '>' + t('pdp_hotel') + ' (+ ' + kr(D.hotelPrice(p.fitsInch)) + ' ' + t('tyre_season') + ')</label>' : '') : '') +
+      '<div class="card" style="padding:16px;display:grid;gap:12px"><div style="display:flex;justify-content:space-between;align-items:baseline"><span>' + t('pdp_total') + '</span><b style="font-size:22px">' + kr(total) + '</b></div>' +
+      (isTyre && st.delivery === 'fit' ? '<button class="btn btn-primary btn-block" data-a="pdp-fit" data-v="' + id + '">' + t('pdp_buy_fit') + ' ' + ic('right', 18) + '</button>' : '<button class="btn btn-primary btn-block" data-a="pdp-cart">' + t('pdp_buy') + '</button>') + '</div>' +
+      '</div></div></main>' + footer();
+  }
+
+  // ---------- Render ----------
+  const app = document.getElementById('app');
+  let toastTimer;
+  function toast(msg) {
+    clearTimeout(toastTimer);
+    let el = document.querySelector('.toast'); if (!el) { el = document.createElement('div'); el.className = 'toast'; document.body.appendChild(el); }
+    el.textContent = msg; toastTimer = setTimeout(() => el.remove(), 2200);
+  }
+  function render() {
+    document.documentElement.lang = S.lang === 'no' ? 'nb' : 'en';
+    const r = route();
+    const parts = r.split('/').filter(Boolean);
+    const q = new URLSearchParams((location.hash.split('?')[1]) || '');
+    if (q.get('i') && parts[0] === 'bestill') { S.presetIntent = q.get('i'); }
+    let html = '';
+    if (parts[0] === 'bestill') html = booking(parts[1] || 'bil', parts[2]);
+    else if (parts[0] === 'produkt') html = pdp(parts[1]);
+    else html = home();
+    if (html) app.innerHTML = html;
+    if (r === '/' && location.hash.indexOf('#/#') === 0) { const el = document.getElementById(location.hash.slice(3)); if (el) el.scrollIntoView(); }
+  }
+
+  // ---------- Actions ----------
+  function doLookup(plate, then) {
+    S.plate = prettyPlate(plate); S.looking = true; S.car = lookup(plate);
+    if (!S.car) { S.looking = false; render(); return; }
+    render();
+    setTimeout(() => { S.looking = false; if (then) then(); else render(); }, 650);
+  }
+  function afterCar() {
+    if (S.after) { const a = S.after; S.after = null; go(a); return; }
+    if (S.presetIntent) { const i = S.presetIntent; S.presetIntent = null; go('/bestill/behov/' + i); return; }
+    go('/bestill/behov');
+  }
+  function toggle(id, single) {
+    const idx = S.items.findIndex((i) => i.id === id);
+    if (idx >= 0) { S.items.splice(idx, 1); return; }
+    if (single) S.items = S.items.filter((i) => { const s = svc(i); return s.cat !== single; });
+    S.items.push({ id });
+  }
+
+  document.addEventListener('click', (e) => {
+    const el = e.target.closest('[data-a]'); if (!el) return;
+    const a = el.dataset.a; const v = el.dataset.v;
+    if (el.tagName === 'A' && a !== 'pick-city') e.preventDefault();
+    switch (a) {
+      case 'lang': S.lang = v; store.set('lang', v); render(); break;
+      case 'nav': go(v); break;
+      case 'hero-try': S.plate = v; doLookup(v, () => go('/bestill/behov')); break;
+      case 'home-intent': S.presetIntent = v; if (S.car) { S.presetIntent = null; go('/bestill/behov/' + v); } else go('/bestill/bil'); break;
+      case 'home-ev': S.presetIntent = 'service'; S.plate = 'EL 12345'; doLookup('EL 12345', () => afterCar()); break;
+      case 'eu-book': S.car = S.euCar; S.plate = S.euCar.plate; S.items = S.items.filter((i) => svc(i).cat !== 'eu'); S.items.push({ id: S.euCar.weight > 3500 ? 'pkk_heavy' : 'pkk' }); go('/bestill/behov/eu'); break;
+      case 'pick-city': S.city = v; S.loc = v; break;
+      case 'car-try': doLookup(v, afterCar); break;
+      case 'car-reset': S.car = null; S.plate = ''; S.items = S.items.filter((i) => i.custom); go('/bestill/bil'); break;
+      case 'to-need': afterCar(); break;
+      case 'intent': go('/bestill/behov/' + v); break;
+      case 'toggle': toggle(v, el.dataset.single); render(); break;
+      case 'sym': {
+        const i = S.symptoms.indexOf(v); if (i >= 0) S.symptoms.splice(i, 1); else S.symptoms.push(v);
+        if (S.symptoms.length && !has('diag')) S.items.push({ id: 'diag' });
+        if (!S.symptoms.length) S.items = S.items.filter((x) => x.id !== 'diag');
+        render(); break;
+      }
+      case 'attach': S.attached += 1; render(); break;
+      case 'remove': {
+        const it = S.items[+v]; S.items.splice(+v, 1);
+        if (it && it.id === 'diag') S.symptoms = [];
+        render(); break;
+      }
+      case 'to-time': if (S.items.length) go('/bestill/tid'); break;
+      case 'city': S.city = v; S.loc = null; S.slot = null; render(); break;
+      case 'loc': S.loc = v; S.slot = null; render(); break;
+      case 'day': S.day = +v; S.slot = null; render(); break;
+      case 'slot': S.slot = v; render(); break;
+      case 'handover': S.handover = v; render(); break;
+      case 'to-you': if (S.slot) go('/bestill/deg'); break;
+      case 'vipps': Object.assign(S.contact, { name: 'Kari Nordmann', phone: '912 34 567', email: 'kari.nordmann@example.no' }); S.err = ''; render(); break;
+      case 'to-confirm': if (validContact()) { S.err = ''; go('/bestill/bekreft'); } else { S.err = t('f_required'); render(); } break;
+      case 'submit': S.ref = 'MJ-' + (24000 + Math.floor(Math.random() * 9000)); go('/bestill/ferdig'); break;
+      case 'restart': Object.assign(S, { items: [], symptoms: [], issueText: '', attached: 0, slot: null, ref: null, day: 0 }); go('/'); break;
+      case 'toast': toast(v); break;
+      case 'pdp-try': S.pdp.car = lookup(v); if (!S.car) S.car = S.pdp.car; render(); break;
+      case 'qty': S.pdp.qty = Math.max(1, Math.min(8, S.pdp.qty + +v)); render(); break;
+      case 'pdp-del': S.pdp.delivery = v; render(); break;
+      case 'pdp-cart': S.cart += S.pdp.qty; toast(t('pdp_added')); render(); break;
+      case 'pdp-fit': {
+        const p = D.products[v];
+        S.items = S.items.filter((i) => !i.custom && svc(i).cat !== 'tyre');
+        S.items.unshift({ id: 'shop_' + v, custom: true, cat: 'shop', name: { no: S.pdp.qty + ' × ' + p.brand + ' ' + p.name, en: S.pdp.qty + ' × ' + p.brand + ' ' + p.name }, price: p.price * S.pdp.qty, mins: 0, mode: 'live' });
+        S.items.push({ id: S.pdp.hotel ? 'hotel' : 'swap' });
+        if (S.pdp.car && !S.car) S.car = S.pdp.car;
+        if (S.car) go('/bestill/tid'); else { S.after = '/bestill/tid'; go('/bestill/bil'); }
+        break;
+      }
+    }
+  });
+
+  document.addEventListener('submit', (e) => {
+    const f = e.target.closest('[data-form]'); if (!f) return;
+    e.preventDefault();
+    const kind = f.dataset.form;
+    if (kind === 'hero') { if (normPlate(S.plate).length >= 4) doLookup(S.plate, () => go('/bestill/behov')); }
+    else if (kind === 'car') { if (normPlate(S.plate).length >= 4) doLookup(S.plate, afterCar); }
+    else if (kind === 'eu') { S.euCar = lookup(S.euPlate); render(); }
+    else if (kind === 'pdp') { S.pdp.car = lookup(S.pdp.plate); if (S.pdp.car && !S.car) S.car = S.pdp.car; render(); }
+  });
+
+  document.addEventListener('input', (e) => {
+    const k = e.target.dataset && e.target.dataset.in; if (!k) return;
+    const val = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+    if (k.indexOf('contact.') === 0) S.contact[k.slice(8)] = val;
+    else if (k === 'pdp.hotel') { S.pdp.hotel = val; render(); }
+    else if (k === 'pdpPlate') S.pdp.plate = val;
+    else S[k] = val;
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
