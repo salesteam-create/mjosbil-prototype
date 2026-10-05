@@ -1,0 +1,329 @@
+{
+ "Intervallservice": {
+  "id": "308887",
+  "addons": [
+   "Skifte slitte vindusviskere"
+  ],
+  "departments": [
+   "Mjøsbil Otta",
+   "Mjøsbil Lillehammer",
+   "Mjøsbil Gjøvik",
+   "Mjøsbil Dokka",
+   "Mjøsbil Fåvang"
+  ]
+ },
+ "EU-kontroll (kjøretøy inntil 3,5 tonn)": {
+  "id": "308872",
+  "addons": [
+   "Skifte slitte vindusviskere",
+   "Batteritest",
+   "Firehjulskontroll inkl. justering",
+   "AC-service",
+   "Bremseservice"
+  ],
+  "departments": [
+   "Mjøsbil Otta",
+   "Mjøsbil Lillehammer",
+   "Mjøsbil Gjøvik",
+   "Mjøsbil Dokka",
+   "Mjøsbil Fåvang"
+  ]
+ },
+ "20-punktsjekk": {
+  "id": "309043",
+  "addons": [
+   "Dekkhotell",
+   "Diagnose",
+   "Reparasjon",
+   "Dekkskift"
+  ],
+  "departments": [
+   "Mjøsbil Otta",
+   "Mjøsbil Lillehammer",
+   "Mjøsbil Gjøvik",
+   "Mjøsbil Dokka",
+   "Mjøsbil Fåvang"
+  ]
+ },
+ "Oljeskift": {
+  "id": "308886",
+  "addons": [
+   "Skifte slitte vindusviskere"
+  ],
+  "departments": [
+   "Mjøsbil Otta",
+   "Mjøsbil Lillehammer",
+   "Mjøsbil Gjøvik",
+   "Mjøsbil Dokka",
+   "Mjøsbil Fåvang"
+  ]
+ },
+ "Økonomiservice for elbil": {
+  "id": "847562",
+  "addons": [
+   "Skifte slitte vindusviskere",
+   "Bremseservice"
+  ],
+  "departments": [
+   "Mjøsbil Otta",
+   "Mjøsbil Lillehammer",
+   "Mjøsbil Gjøvik",
+   "Mjøsbil Dokka",
+   "Mjøsbil Fåvang"
+  ]
+ },
+ "Økonomiservice for elbil inkl. bremseservice": {
+  "id": "849841",
+  "addons": [
+   "Skifte slitte vindusviskere"
+  ],
+  "departments": [
+   "Mjøsbil Otta",
+   "Mjøsbil Lillehammer",
+   "Mjøsbil Gjøvik",
+   "Mjøsbil Dokka",
+   "Mjøsbil Fåvang"
+  ]
+ },
+ "Firehjulskontroll inkl. justering": {
+  "id": "309046",
+  "addons": [
+   "Skifte slitte vindusviskere",
+   "Batteritest",
+   "AC-service",
+   "Intervallservice",
+   "Oljeskift"
+  ],
+  "departments": [
+   "Mjøsbil Otta",
+   "Mjøsbil Lillehammer",
+   "Mjøsbil Gjøvik",
+   "Mjøsbil Dokka",
+   "Mjøsbil Fåvang"
+  ]
+ },
+ "Flushing av automatgirkasse": {
+  "id": "309048",
+  "addons": [
+   "Skifte slitte vindusviskere",
+   "Batteritest"
+  ],
+  "departments": [
+   "Mjøsbil Otta",
+   "Mjøsbil Lillehammer",
+   "Mjøsbil Gjøvik",
+   "Mjøsbil Dokka"
+  ]
+ },
+ "Reparasjon": {
+  "id": "309042",
+  "addons": [
+   "Skifte slitte vindusviskere",
+   "Batteritest",
+   "Diagnose"
+  ],
+  "departments": [
+   "Mjøsbil Otta",
+   "Mjøsbil Lillehammer",
+   "Mjøsbil Gjøvik",
+   "Mjøsbil Dokka",
+   "Mjøsbil Fåvang"
+  ]
+ },
+ "Annet": {
+  "id": "309057",
+  "addons": [
+   "Dekkhotell",
+   "Økonomiservice for elbil inkl. bremseservice",
+   "Økonomiservice for elbil",
+   "Skifte slitte vindusviskere",
+   "Annet",
+   "Batteritest",
+   "Bobilservice",
+   "Caravanservice",
+   "Tilhengerservice",
+   "Flushing av automatgirkasse",
+   "Firehjulskontroll inkl. justering",
+   "Diagnose",
+   "AC-service",
+   "20-punktsjekk",
+   "Reparasjon",
+   "EU-kontroll (tyngre kjøretøy inntil 7,5 tonn)",
+   "Intervallservice",
+   "Oljeskift",
+   "Miljøservice",
+   "EU-kontroll (kjøretøy inntil 3,5 tonn)",
+   "Bremseservice",
+   "Dekkskift"
+  ],
+  "departments": [
+   "Mjøsbil Otta",
+   "Mjøsbil Lillehammer",
+   "Mjøsbil Gjøvik",
+   "Mjøsbil Dokka",
+   "Gjøvik Vulk AS",
+   "Mjøsbil Fåvang"
+  ]
+ },
+ "Batteritest": {
+  "id": "309056",
+  "addons": [
+   "Skifte slitte vindusviskere"
+  ],
+  "departments": [
+   "Mjøsbil Otta",
+   "Mjøsbil Lillehammer",
+   "Mjøsbil Gjøvik",
+   "Mjøsbil Dokka",
+   "Mjøsbil Fåvang"
+  ]
+ },
+ "EU-kontroll (tyngre kjøretøy inntil 7,5 tonn)": {
+  "id": "309041",
+  "addons": [
+   "Skifte slitte vindusviskere",
+   "Batteritest",
+   "AC-service"
+  ],
+  "departments": [
+   "Mjøsbil Lillehammer",
+   "Mjøsbil Gjøvik",
+   "Mjøsbil Dokka"
+  ]
+ },
+ "Bremseservice": {
+  "id": "308859",
+  "addons": [
+   "Skifte slitte vindusviskere"
+  ],
+  "departments": [
+   "Mjøsbil Otta",
+   "Mjøsbil Lillehammer",
+   "Mjøsbil Gjøvik",
+   "Mjøsbil Dokka",
+   "Mjøsbil Fåvang"
+  ]
+ },
+ "Diagnose": {
+  "id": "309045",
+  "addons": [
+   "Skifte slitte vindusviskere"
+  ],
+  "departments": [
+   "Mjøsbil Otta",
+   "Mjøsbil Lillehammer",
+   "Mjøsbil Gjøvik",
+   "Mjøsbil Dokka",
+   "Mjøsbil Fåvang"
+  ]
+ },
+ "Dekkhotell": {
+  "id": "309055",
+  "addons": [
+   "Dekkhotell",
+   "Skifte slitte vindusviskere",
+   "Batteritest"
+  ],
+  "departments": [
+   "Mjøsbil Otta",
+   "Mjøsbil Lillehammer",
+   "Mjøsbil Dokka",
+   "Gjøvik Vulk AS",
+   "Mjøsbil Fåvang"
+  ]
+ },
+ "Dekkskift": {
+  "id": "308857",
+  "addons": [
+   "Dekkhotell",
+   "Skifte slitte vindusviskere",
+   "Bremseservice"
+  ],
+  "departments": [
+   "Mjøsbil Otta",
+   "Mjøsbil Lillehammer",
+   "Mjøsbil Dokka",
+   "Gjøvik Vulk AS",
+   "Mjøsbil Fåvang"
+  ]
+ },
+ "AC-service": {
+  "id": "309044",
+  "addons": [
+   "Skifte slitte vindusviskere",
+   "Batteritest"
+  ],
+  "departments": [
+   "Mjøsbil Otta",
+   "Mjøsbil Lillehammer",
+   "Mjøsbil Gjøvik",
+   "Mjøsbil Dokka",
+   "Mjøsbil Fåvang"
+  ]
+ },
+ "Miljøservice": {
+  "id": "308885",
+  "addons": [
+   "Dekkhotell",
+   "Dekkskift"
+  ],
+  "departments": [
+   "Mjøsbil Otta",
+   "Mjøsbil Lillehammer",
+   "Mjøsbil Gjøvik",
+   "Mjøsbil Fåvang"
+  ]
+ },
+ "Bobilservice": {
+  "id": "309052",
+  "addons": [
+   "Dekkhotell",
+   "Skifte slitte vindusviskere",
+   "Batteritest",
+   "Diagnose",
+   "AC-service",
+   "Dekkskift"
+  ],
+  "departments": [
+   "Mjøsbil Lillehammer",
+   "Mjøsbil Gjøvik",
+   "Mjøsbil Dokka",
+   "Mjøsbil Fåvang"
+  ]
+ },
+ "Tilhengerservice": {
+  "id": "309050",
+  "addons": [
+   "Annet"
+  ],
+  "departments": [
+   "Mjøsbil Otta",
+   "Mjøsbil Lillehammer",
+   "Mjøsbil Gjøvik",
+   "Mjøsbil Dokka",
+   "Mjøsbil Fåvang"
+  ]
+ },
+ "Caravanservice": {
+  "id": "309051",
+  "addons": [
+   "Bremseservice"
+  ],
+  "departments": [
+   "Mjøsbil Lillehammer",
+   "Mjøsbil Gjøvik",
+   "Mjøsbil Dokka",
+   "Mjøsbil Fåvang"
+  ]
+ },
+ "Skifte slitte vindusviskere": {
+  "id": "458033",
+  "addons": [
+   "Annet"
+  ],
+  "departments": [
+   "Mjøsbil Otta",
+   "Mjøsbil Dokka"
+  ]
+ }
+}
