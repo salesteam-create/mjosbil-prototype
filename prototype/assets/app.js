@@ -20,14 +20,14 @@
     shopCat: 'alle', shopFit: false,
     user: null, mineCar: 'EL12345', garageCars: D.garage.cars.slice(), extraCars: {},
     pdp: { id: null, qty: 4, delivery: 'fit', hotel: true, plate: '', car: null },
-    modal: null, chat: [], chatTyping: false, addPlate: '',
+    modal: null, chat: [], chatTyping: false, addPlate: '', notify: { sms: true, email: true },
     lastRoute: '',
   };
 
   // ---------- Helpers ----------
   const t = (k, vars) => {
     let s = (I[S.lang] && I[S.lang][k]) || I.no[k] || k;
-    if (vars && typeof s === 'string') Object.keys(vars).forEach((v) => { s = s.replace('{' + v + '}', vars[v]); });
+    if (vars && typeof s === 'string') Object.keys(vars).forEach((v) => { s = s.split('{' + v + '}').join(vars[v]); });
     return s;
   };
   const L = (o) => (o && typeof o === 'object' && 'no' in o ? o[S.lang] || o.no : o);
@@ -186,6 +186,7 @@
       '<div class="usps"><span>' + ic('circle-check') + t('usp_price') + '</span><span>' + ic('zap') + t('usp_ev') + '</span><span>' + ic('shield-check') + t('usp_falck') + '</span></div>' +
       '</div><div class="hero-photo" ' + bg(IMG.hero) + '><a class="float-card" href="#/avdeling/gjovik"><span class="tile">' + ic('calendar-check') + '</span><span><small>' + t('hero_first', { loc: gj.name }) + '</small><b>' + firstFreeLabel(gj) + '</b></span></a></div></div></section>' +
 
+      seasonStrip() +
       '<section class="section"><div class="wrap"><div class="sec-h"><h2>' + t('intent_title') + '</h2></div><div class="intents">' +
       CATS.map((c) => '<button class="intent" data-a="home-cat" data-v="' + c.id + '"><span class="tile-ico">' + ic(c.icon) + '</span><span><b>' + t('i_' + c.id) + '</b><small>' + t('i_' + c.id + '_sub') + '</small></span><span class="go">' + ic('arrow-right') + '</span></button>').join('') +
       '</div></div></section>' +
@@ -215,6 +216,57 @@
       '<div class="locs">' + D.locations.map((l) => '<a class="loc-card" href="#/avdeling/' + l.id + '"><span class="tile-ico">' + ic('map-pin') + '</span><span><b>' + esc(l.name) + '</b><span class="meta">' + t('first_free') + ': <b>' + firstFreeLabel(l) + '</b></span></span><span class="go">' + ic('arrow-right') + '</span></a>').join('') +
       '</div></div></section></main>' + footer();
   }
+
+  // ---------- Tyre season ----------
+  function weekLoad() {
+    let free = 0, all = 0;
+    D.locations.forEach((l) => { for (let d = 0; d < 5; d++) { const sl = slotsFor(l, d); all += sl.length; free += sl.filter(Boolean).length; } });
+    return Math.round(100 - (free / all) * 100);
+  }
+  const hotelOf = (key) => (S.user && D.garage[key] && D.garage[key].hotel) ? D.garage[key].hotel : null;
+  function seasonStrip() {
+    const h = hotelOf('EL12345');
+    if (h) {
+      const loc = locById(h.loc);
+      return '<section class="season"><div class="wrap"><div class="season-card me"><div class="season-photo" ' + bg(IMG.hotel) + '></div><div class="season-body"><span class="kicker">' + ic('snowflake') + t('ss_kicker') + '</span>' +
+        '<h3>' + t('ss_me_title', { name: first(S.user.name) }) + '</h3><p>' + t('ss_me_text', { what: esc(L(h.stored)), loc: esc(loc.name), shelf: esc(h.shelf), when: firstFreeLabel(loc) }) + '</p>' +
+        '<div class="season-cta"><button class="btn btn-ink" data-a="express" data-v="EL12345">' + ic('zap') + t('express') + '</button><a class="link" href="#/min-bil">' + t('nav_mine') + ic('arrow-right') + '</a></div></div></div></div></section>';
+    }
+    return '<section class="season"><div class="wrap"><div class="season-card"><div class="season-body"><span class="kicker">' + ic('snowflake') + t('ss_kicker') + '</span>' +
+      '<h3>' + t('ss_title') + '</h3><p>' + t('ss_text', { pct: weekLoad() }) + ' ' + t('ss_hotel') + '.</p>' +
+      '<div class="meter warn" aria-hidden="true"><i style="width:' + weekLoad() + '%"></i></div>' +
+      '<div class="season-cta"><button class="btn btn-ink" data-a="home-cat" data-v="tyre">' + t('season_cta') + ic('arrow-right') + '</button><span class="muted">' + t('ss_login') + ' <button class="link" data-a="season-login">' + t('ss_login_cta') + '</button></span></div></div></div></div></section>';
+  }
+
+  // ---------- Reminders ----------
+  function reminders(key) {
+    const car = getCar(key); const g = garageOf(key); const name = first(S.user ? S.user.name : '');
+    const today = new Date(); const out = [];
+    const add = (o) => out.push(o);
+    const days = (n) => { const d = new Date(today); d.setDate(d.getDate() + n); return d; };
+    if (g.hotel) add({ ch: 'sms', when: days(-1), sent: true, title: t('rem_tyre_t'), text: t('rem_tyre', { name, what: L(g.hotel.stored), shelf: g.hotel.shelf, loc: locById(g.hotel.loc).name, plate: normPlate(car.plate) }), cta: { a: 'express', v: key } });
+    if (S.booking && S.booking.car.key === key) {
+      const b = S.booking; const loc = locById(b.loc);
+      add({ ch: 'sms', when: today, sent: true, now: true, title: t('rem_conf_t'), text: t('rem_conf', { name: first(b.contact.name), what: b.items.map((i) => L(svc(i).name)).join(', '), loc: loc.name, when: whenText(b), ref: b.ref }), cta: { a: 'nav', v: '/min-bil' } });
+      const dayBefore = new Date(DAYS[b.day]); dayBefore.setDate(dayBefore.getDate() - 1);
+      add({ ch: 'sms', when: dayBefore, sent: false, title: t('rem_day_t'), text: t('rem_day', { loc: loc.name, time: b.slot, bring: bringList(b).join(', ').toLowerCase(), phone: D.phone }) });
+    }
+    const reco = g.recos.find((r) => r.level === 'warn');
+    if (reco) add({ ch: 'email', when: days(-21), sent: true, title: t('rem_reco_t'), text: t('rem_reco', { name, what: L(reco.title).toLowerCase() }), cta: reco.add ? { a: 'mine-add', v: reco.add } : null });
+    if (g.nextService && g.nextService.pct >= 90) add({ ch: 'email', when: days(-14), sent: true, title: t('rem_service_t'), text: t('rem_service', { since: L(car.lastService).replace(/ siden| ago/, ''), plate: car.plate, svc: L(D.services[car.fuel === 'ev' ? 'ev_eco_brk' : 'eco20'].name).toLowerCase() }), cta: { a: 'mine-book', v: 'service' } });
+    const euWarn = new Date(car.euDue); euWarn.setDate(euWarn.getDate() - 56);
+    add({ ch: 'sms', when: euWarn < today ? days(-3) : euWarn, sent: euWarn < today, title: t('rem_eu_t'), text: t('rem_eu', { plate: car.plate, date: fmt(car.euDue, { day: 'numeric', month: 'long', year: 'numeric' }) }), cta: { a: 'mine-book', v: 'eu' } });
+    return out.sort((a, b) => (a.sent === b.sent ? (a.sent ? b.when - a.when : a.when - b.when) : a.sent ? -1 : 1));
+  }
+  function remindersPanel(key) {
+    const list = reminders(key);
+    const tog = (k) => '<label class="switch sm"><input type="checkbox" data-in="notify.' + k + '" ' + (S.notify[k] ? 'checked' : '') + '><span></span>' + t('rem_' + k) + '</label>';
+    return '<div class="panel"><div class="panel-h"><div><h2>' + t('rem_title') + '</h2><p class="muted" style="font-size:13px">' + t('rem_sub') + '</p></div></div><div class="panel-b">' +
+      '<div class="notify-toggles">' + tog('sms') + tog('email') + '</div><div class="rem-list">' +
+      list.map((r, i) => { const off = !S.notify[r.ch]; return '<button class="rem' + (off && !r.sent ? ' off' : '') + '" data-a="open" data-v="msg:' + i + '"><span class="tile-ico">' + ic(r.ch === 'sms' ? 'message-square' : 'file-text') + '</span><span class="t"><b>' + esc(r.title) + '</b><small>' + (r.ch === 'sms' ? t('rem_sms') : t('rem_email')) + ' · ' + (r.now ? t('rem_now') : dShort(r.when)) + '</small></span>' +
+        (r.sent ? '<span class="tag tag-ok">' + t('rem_sent') + '</span>' : off ? '<span class="tag">' + t('rem_off') + '</span>' : '<span class="tag tag-mjos">' + t('rem_planned') + '</span>') + '</button>'; }).join('') + '</div></div></div>';
+  }
+  function linkify(text) { return esc(text).replace(/(mjosbil\.no\/b\/[\w-]+)/g, '<u>$1</u>'); }
 
   // ---------- Shop ----------
   function shop() {
@@ -431,6 +483,7 @@
       }).join('') + '</div>' +
         '<div class="sub-h">' + t('pick_time') + ' <span class="muted" style="font-weight:500;font-size:14px">· ' + fmt(DAYS[S.day], { weekday: 'long', day: 'numeric', month: 'long' }) + '</span></div>' + '<div class="slots">' + SLOT_TIMES.map((tm, i) => '<button class="slot ' + (S.slot === tm ? 'on' : '') + '" data-a="slot" data-v="' + tm + '" ' + (slots[i] ? '' : 'disabled') + '>' + tm + '</button>').join('') + '</div>' +
         (tot.request ? '<div class="note warn">' + ic('info') + '<span>' + t('req_note') + '</span></div>' : '') +
+        (has('hotel') && hotelOf(S.car.key) ? '<div class="note ok">' + ic('package') + '<span>' + t('express_note', { shelf: esc(hotelOf(S.car.key).shelf) }) + '</span></div>' : '') +
         (S.editing ? '' : '<div class="sub-h">' + t('handover') + '</div><div class="radios">' +
         '<button class="radio-row ' + (S.handover === 'drop' ? 'on' : '') + '" data-a="handover" data-v="drop"><span class="radio"></span><span class="t"><b>' + t('h_drop') + '</b><small>' + t('h_drop_sub') + '</small></span></button>' +
         '<button class="radio-row ' + (S.handover === 'wait' ? 'on' : '') + '" data-a="handover" data-v="wait" ' + (canWait ? '' : 'disabled') + '><span class="radio"></span><span class="t"><b>' + t('h_wait') + '</b><small>' + (canWait ? t('h_wait_sub') : t('h_wait_long')) + '</small></span></button>' +
@@ -547,7 +600,7 @@
         '<div><b>' + esc(L(h.stored)) + '</b> · <span class="muted">' + esc(h.brand) + '</span><div class="muted" style="font-size:14px">' + t('hotel_stored', { loc: esc(locById(h.loc).name), shelf: esc(h.shelf) }) + '<br>' + t('hotel_on', { what: esc(L(h.on).toLowerCase()) }) + '</div></div>' +
         '<div><div class="lbl muted" style="font-size:12px;font-weight:700;margin-bottom:6px">' + t('hotel_tread') + '</div><div class="tread">' + h.tread.map((v, i) => '<div><small>' + t('tread_' + pos[i]) + '</small><b class="' + (v < 5.5 ? 'w' : '') + '">' + v.toLocaleString('nb-NO') + '</b></div>').join('') + '</div></div>' +
         '<div class="note warn">' + ic('snowflake') + '<span><b>' + t('hotel_swap') + '.</b> ' + t('season_text') + '</span></div>' +
-        '<button class="btn btn-ink" data-a="mine-book" data-v="tyre">' + t('hotel_swap_cta') + ic('arrow-right') + '</button></div></div></div>';
+        '<div class="btn-row"><button class="btn btn-ink" data-a="express" data-v="' + key + '">' + ic('zap') + t('express') + '</button><button class="btn btn-ghost" data-a="mine-book" data-v="tyre">' + t('hotel_swap_cta') + '</button></div></div></div></div>';
     } else {
       hotel = '<div class="panel"><div class="panel-h"><h2>' + t('hotel_title') + '</h2></div><div class="panel-b"><div class="upcoming"><span class="tile-ico">' + ic('package') + '</span><div style="flex:1"><b>' + t('hotel_none') + '</b></div><button class="btn btn-ghost btn-sm" data-a="mine-book" data-v="tyre">' + t('hotel_none_cta') + '</button></div></div></div>';
     }
@@ -567,7 +620,7 @@
       stat('life-buoy', t('s_falck'), g.falck ? 'Falck 24/7' : '–', g.falck ? t('s_falck_until', { date: dShort(g.falck) }) : t('new_car_hist'), g.falck ? '<span class="tag tag-ok">' + ic('circle-check') + '</span>' : '') +
       stat('gauge', t('s_km'), g.km ? g.km.toLocaleString('nb-NO') + ' km' : '–', t('s_km_sub')) +
       '</div></div>' +
-      '<div class="wrap grid"><div class="col">' + upcoming + recos + hotel + '</div><div class="col">' + quick + history + '</div></div></main>' + footer();
+      '<div class="wrap grid"><div class="col">' + upcoming + recos + hotel + '</div><div class="col">' + quick + remindersPanel(key) + history + '</div></div></main>' + footer();
   }
 
   // ---------- Modals ----------
@@ -613,6 +666,14 @@
         (S.chatTyping ? '<div class="msg agent typing"><i></i><i></i><i></i></div>' : '') + '</div>' +
         '<div class="chat-qs">' + [1, 2, 3].map((n) => '<button class="chip" data-a="chat-q" data-v="' + n + '">' + t('chat_q' + n) + '</button>').join('') + '</div>';
       return shell('drawer chat', t('chat_title'), body, '<form class="chat-in" data-form="chat"><input class="input" id="chat-input" placeholder="' + t('chat_ph') + '" autocomplete="off"><button class="btn btn-ink" type="submit" aria-label="Send">' + ic('arrow-right') + '</button></form>');
+    }
+    if (type === 'msg') {
+      const r = reminders(S.mineCar)[+arg]; if (!r) return '';
+      const cta = r.cta ? '<button class="btn btn-ink btn-block" data-a="' + r.cta.a + '" data-v="' + r.cta.v + '">' + t('rem_open') + ic('arrow-right') + '</button>' : '';
+      if (r.ch === 'sms') {
+        return shell('dialog phone-wrap', r.title, '<div class="phone"><div class="phone-top"><span>9:41</span><span class="notch"></span><span>' + ic('zap') + '</span></div><div class="phone-h"><span class="avatar">' + ic('wrench') + '</span><b>' + t('sms_sender') + '</b><small>' + (r.now ? t('today') : dShort(r.when)) + '</small></div><div class="phone-b"><div class="bubble">' + linkify(r.text) + '<small>' + t('rem_stop') + '</small></div></div></div>', cta);
+      }
+      return shell('dialog doc', r.title, '<div class="mail"><div class="doc-h"><img src="' + IMG.logoDark + '" alt="Mjøsbil"><div><b>' + esc(r.title) + '</b><small>' + t('rem_from') + ' · ' + dShort(r.when) + '</small></div></div><p>' + linkify(r.text) + '</p></div>', cta);
     }
     if (type === 'addcar') {
       return shell('dialog', t('addcar_title'), '<p class="muted">' + t('addcar_sub') + '</p><form class="plate-row" data-form="addcar" novalidate>' + plateInput('addPlate', S.addPlate, 'addcar') + '<button class="btn btn-ink" type="submit">' + t('addcar_cta') + '</button></form>' + plateErr('addcar'));
@@ -746,6 +807,8 @@
         go('/bestill/ferdig'); break;
       }
       case 'ics': if (S.booking) downloadIcs(S.booking); break;
+      case 'express': { S.car = getCar(v); S.plate = S.car.plate; S.items = [{ id: 'hotel' }]; S.symptoms = []; S.editing = false; S.cat = 'tyre'; const h = D.garage[v] && D.garage[v].hotel; if (h) { S.loc = h.loc; S.city = h.loc; } if (S.user && !S.contact.name) fillContact(); go('/bestill/tid'); break; }
+      case 'season-login': S.user = { name: D.garage.owner }; render(); toast(t('hi', { name: first(S.user.name) }), 'user'); break;
       case 'done-mine': go('/min-bil'); break;
       case 'restart': Object.assign(S, { items: [], symptoms: [], issueText: '', attached: 0, slot: null, day: 0 }); go('/'); break;
       case 'login': S.user = { name: D.garage.owner }; render(); break;
@@ -819,6 +882,7 @@
     }
     if (k.indexOf('contact.') === 0) S.contact[k.slice(8)] = val;
     else if (k.indexOf('co.') === 0) S.checkout[k.slice(3)] = val;
+    else if (k.indexOf('notify.') === 0) { S.notify[k.slice(7)] = val; render(); }
     else if (k === 'pdp.hotel') { S.pdp.hotel = val; render(); }
     else if (k === 'pdpPlate') S.pdp.plate = val;
     else if (k === 'shopFit') { S.shopFit = val; render(); }

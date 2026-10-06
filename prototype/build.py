@@ -10,7 +10,7 @@ mime = {'.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png'}
 def inline(m):
     f = root / m.group(0)
     return f'data:{mime[f.suffix]};base64,' + base64.b64encode(f.read_bytes()).decode()
-html = re.sub(r'assets/img/[\w.-]+\.(?:jpe?g|png)', inline, html)
+html = re.sub(r'assets/img/[\w./-]+\.(?:jpe?g|png)', inline, html)
 out = root / 'dist' / 'mjosbil-prototype.html'
 out.parent.mkdir(exist_ok=True)
 out.write_text(html, encoding='utf8')

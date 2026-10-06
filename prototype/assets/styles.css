@@ -742,3 +742,47 @@ label.attach:hover { border-color: var(--ink); }
   .overlay { position: static; background: none; backdrop-filter: none; }
   .sheet { box-shadow: none; width: 100% !important; max-height: none; }
 }
+
+/* ===== Tyre season + reminders ===== */
+.season { margin-top: -28px; position: relative; z-index: 2; }
+.season-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-panel); box-shadow: var(--d1); overflow: hidden; display: grid; }
+.season-body { padding: 22px; display: grid; gap: 10px; align-content: center; }
+.season-body h3 { font-size: clamp(22px, 3.6vw, 28px); font-weight: 800; line-height: 1.1; }
+.season-body p { color: var(--ink-2); }
+.season-body .meter { max-width: 420px; }
+.season-cta { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin-top: 6px; font-size: 14px; }
+.season-card.me { border-color: var(--mjos); box-shadow: 0 0 0 1px var(--mjos), var(--d1); }
+.season-photo { min-height: 160px; background: 20% 30% / cover no-repeat; }
+.switch.sm { font-size: 13px; gap: 8px; }
+.switch.sm span { width: 34px; height: 20px; }
+.switch.sm span::after { width: 14px; height: 14px; }
+.switch.sm input:checked + span::after { transform: translateX(14px); }
+.notify-toggles { display: flex; gap: 18px; flex-wrap: wrap; padding-bottom: 4px; }
+.rem-list { display: grid; gap: 6px; }
+.rem { width: 100%; text-align: left; display: flex; gap: 12px; align-items: center; background: var(--sno); border: 1px solid transparent; border-radius: 14px; padding: 10px 12px; }
+.rem:hover { border-color: var(--ink); background: #fff; }
+.rem .tile-ico { width: 34px; height: 34px; border-radius: 10px; }
+.rem .tile-ico .ico { width: 17px; height: 17px; }
+.rem .t { flex: 1; min-width: 0; }
+.rem .t b { display: block; font-size: 14px; }
+.rem .t small { font: 600 12px var(--label); color: var(--muted); }
+.rem.off { opacity: .55; }
+.phone-wrap .sheet-b { background: var(--sno); }
+.phone { width: min(300px, 100%); margin: 0 auto; background: #fff; border: 8px solid var(--ink); border-radius: 36px; overflow: hidden; box-shadow: var(--d2); }
+.phone-top { display: flex; justify-content: space-between; align-items: center; padding: 8px 18px 4px; font: 700 12px var(--label); }
+.phone-top .ico { width: 14px; height: 14px; }
+.notch { width: 80px; height: 18px; background: var(--ink); border-radius: 0 0 12px 12px; margin-top: -8px; }
+.phone-h { display: grid; justify-items: center; gap: 2px; padding: 8px 0 12px; border-bottom: 1px solid var(--line-2); }
+.phone-h .avatar { width: 44px; height: 44px; }
+.phone-h b { font-size: 13px; }
+.phone-h small { font-size: 11px; color: var(--muted); }
+.phone-b { padding: 16px 12px 28px; min-height: 220px; background: #fff; }
+.bubble { background: #e9e9eb; border-radius: 18px 18px 18px 6px; padding: 10px 13px; font-size: 14px; line-height: 1.4; max-width: 90%; display: grid; gap: 8px; }
+.bubble u { color: #0a66d6; text-decoration: underline; }
+.bubble small { font-size: 11px; color: var(--muted); }
+.mail p { font-size: 15px; line-height: 1.6; margin-top: 14px; }
+.mail u { color: var(--mjos-ink); }
+@media (min-width: 720px) {
+  .season-card.me { grid-template-columns: 240px 1fr; }
+  .season-body { padding: 26px 30px; }
+}
