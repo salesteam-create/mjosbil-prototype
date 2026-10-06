@@ -15,3 +15,10 @@ out = root / 'dist' / 'mjosbil-prototype.html'
 out.parent.mkdir(exist_ok=True)
 out.write_text(html, encoding='utf8')
 print(out, f'{len(html) / 1e6:.2f} MB')
+
+# GitHub Pages serves /docs on the repo's default branch.
+docs = root.parent / 'docs'
+docs.mkdir(exist_ok=True)
+(docs / 'index.html').write_text(html, encoding='utf8')
+(docs / '.nojekyll').write_text('', encoding='utf8')
+print(docs / 'index.html')

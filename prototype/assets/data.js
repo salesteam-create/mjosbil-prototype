@@ -119,28 +119,52 @@ window.MB_DATA = (function () {
     { id: 'otta', name: 'Mjøsbil Otta', area: 'Otta', addr: 'Otta', km: { gjovik: 135, lillehammer: 95, otta: 2, dokka: 165, favang: 50 }, no: ['pkk_heavy', 'rv'], seed: 9 },
   ];
 
+  // Real products and prices from mjosbil.no (October 2026). `was` = price before campaign.
+  // hakkar5ev is added for the demo (19" EV tyre) and has an example price.
+  const img = (n) => 'assets/img/p/' + n + '.jpg';
   const products = {
-    hakka10: {
-      brand: 'Nokian', name: 'Hakkapeliitta 10', spec: '205/55 R16 94T XL', price: 1849, example: true, unit: L('per dekk', 'per tyre'),
-      cat: L('Vinterdekk, piggdekk', 'Winter tyres, studded'), fitsInch: 16, fitting: 'swap', img: 'assets/img/hakka.jpg', cover: true,
-      bullets: L(['Testvinner for nordiske vinterforhold', 'Piggdekk med kort bremselengde på is', 'Støynivå 67 dB'], ['Test winner for Nordic winter', 'Studded, short braking distance on ice', 'Noise level 67 dB']),
-    },
-    sailun: {
-      brand: 'Sailun', name: 'Ice Blazer WST3', spec: '205/55 R16 94T', price: 1090, example: true, unit: L('per dekk', 'per tyre'),
-      cat: L('Vinterdekk, piggdekk', 'Winter tyres, studded'), fitsInch: 16, fitting: 'swap',
-      bullets: L(['Rimelig piggdekk', 'God grep på snø'], ['Budget studded tyre', 'Good grip on snow']),
-    },
-    oil: {
-      brand: 'Castrol', name: 'GTX Ultraclean 10W-40', spec: '4 liter', price: 549, example: true, unit: L('per kanne', 'per can'),
-      cat: L('Motorolje', 'Engine oil'), img: 'assets/img/oil.jpg',
-      bullets: L(['Renser motoren og hindrer slam', 'For bensin og diesel'], ['Cleans the engine and prevents sludge', 'For petrol and diesel']),
-    },
-    heater: {
-      brand: 'Airrex', name: 'AH-200i WiFi', spec: L('Infrarød dieselvarmer', 'Infrared diesel heater'), price: 21990, example: true, unit: L('stk', 'each'),
-      cat: L('Verksted og garasje', 'Workshop and garage'), img: 'assets/img/airrex.jpg',
-      bullets: L(['Styres fra mobilen', 'For garasje og verksted'], ['App controlled', 'For garage and workshop']),
-    },
+    hakka10: { cat: 'dekk', brand: 'Nokian', name: 'Hakkapeliitta 10', spec: '205/55 R16 94T XL', price: 2183, was: 3233, unit: L('per dekk', 'per tyre'), img: img('hakka10'), tyre: { inch: 16, type: L('Piggdekk', 'Studded') },
+      bullets: L(['Nordisk testvinner på is og snø', 'Piggdekk med kort bremselengde', 'Pris per dekk, montering kan bestilles'], ['Nordic test winner on ice and snow', 'Studded with short braking distance', 'Price per tyre, fitting can be booked']) },
+    hakkar5: { cat: 'dekk', brand: 'Nokian', name: 'Hakkapeliitta R5', spec: '205/55 R16 94R · EU B/D · 67 dB', price: 2018, was: 2956, unit: L('per dekk', 'per tyre'), img: img('hakkar5'), tyre: { inch: 16, type: L('Piggfritt', 'Studless') },
+      bullets: L(['Piggfritt vinterdekk', 'Lav rullemotstand', 'Stille: 67 dB'], ['Studless winter tyre', 'Low rolling resistance', 'Quiet: 67 dB']) },
+    hakkar5ev: { cat: 'dekk', brand: 'Nokian', name: 'Hakkapeliitta R5 EV', spec: '235/50 R19 103R XL', price: 3290, example: true, unit: L('per dekk', 'per tyre'), img: img('hakkar5'), tyre: { inch: 19, type: L('Piggfritt, elbil', 'Studless, EV') },
+      bullets: L(['Laget for tunge elbiler', 'Lav rullemotstand gir lengre rekkevidde', 'Forsterket for høyt dreiemoment'], ['Made for heavy EVs', 'Low rolling resistance for more range', 'Reinforced for high torque']) },
+    sailun: { cat: 'dekk', brand: 'Sailun', name: 'Ice Blazer WST3', spec: '205/55 R16 94T', price: 1292, was: 1791, unit: L('per dekk', 'per tyre'), img: img('sailun'), tyre: { inch: 16, type: L('Piggdekk', 'Studded') },
+      bullets: L(['Rimelig piggdekk', 'Godt grep på snø'], ['Budget studded tyre', 'Good grip on snow']) },
+    edge: { cat: 'olje', brand: 'Castrol', name: 'EDGE 5W-30 LL', spec: '4 liter', price: 986, was: 1846, unit: L('per kanne', 'per can'), img: img('edge'),
+      bullets: L(['Long Life-olje for VW-konsernet', 'Godkjent VW 504 00 / 507 00'], ['Long Life oil for VW Group', 'Approved VW 504 00 / 507 00']) },
+    gtx: { cat: 'olje', brand: 'Castrol', name: 'GTX Ultraclean 10W-40', spec: 'A3/B4 · 4 liter', price: 586, was: 1056, unit: L('per kanne', 'per can'), img: img('gtx'),
+      bullets: L(['Renser motoren og hindrer slam', 'For bensin og diesel'], ['Cleans the engine and prevents sludge', 'For petrol and diesel']) },
+    blaster: { cat: 'pleie', brand: 'Autoglym', name: 'Polar Blaster', spec: L('Skumkanon', 'Foam cannon'), price: 1449, unit: L('stk', 'each'), img: img('blaster'),
+      bullets: L(['Skumkanon for høytrykksspyler', 'Passer Polar Blast'], ['Foam cannon for pressure washers', 'Works with Polar Blast']) },
+    polarblast: { cat: 'pleie', brand: 'Autoglym', name: 'Polar Blast', spec: '2,5 liter', price: 489, unit: L('stk', 'each'), img: img('polarblast'),
+      bullets: L(['Snøskum for forvask', 'Løser veisalt og skitt'], ['Snow foam pre-wash', 'Loosens road salt and dirt']) },
+    mitt: { cat: 'pleie', brand: 'Autoglym', name: 'Polar Mitt', spec: L('Vaskehanske', 'Wash mitt'), price: 539, unit: L('stk', 'each'), img: img('mitt'),
+      bullets: L(['Myk mikrofiber', 'Skånsom mot lakken'], ['Soft microfibre', 'Gentle on paint']) },
+    ironx: { cat: 'pleie', brand: 'Iron X', name: 'Selaclean Iron X-It', spec: '500 ml', price: 219, unit: L('stk', 'each'), img: img('ironx'),
+      bullets: L(['Fjerner flyrust og bremsestøv', 'For felger og lakk'], ['Removes fallout and brake dust', 'For wheels and paint']) },
+    extract: { cat: 'pleie', brand: 'Tershine', name: 'Extract', spec: L('Alkalisk avfetting · 1 liter', 'Alkaline degreaser · 1 litre'), price: 159, unit: L('stk', 'each'), img: img('extract'),
+      bullets: L(['Effektiv avfetting', 'Til forvask og motorrom'], ['Effective degreaser', 'For pre-wash and engine bay']) },
+    rupes: { cat: 'pleie', brand: 'Rupes', name: 'BigFoot LHR75', spec: L('Polermaskin', 'Polisher'), price: 6649, unit: L('stk', 'each'), img: img('rupes'),
+      bullets: L(['Kompakt eksenterpolerer', 'For proff finish hjemme'], ['Compact random orbital polisher', 'Pro finish at home']) },
+    airrex200: { cat: 'garasje', brand: 'Airrex', name: 'AH-200i WiFi', spec: L('Infrarød dieselvarmer · 13 kW', 'Infrared diesel heater · 13 kW'), price: 23900, unit: L('stk', 'each'), img: img('airrex200'),
+      bullets: L(['Styres fra mobilen', 'For garasje og verksted'], ['App controlled', 'For garage and workshop']) },
+    airrex300: { cat: 'garasje', brand: 'Airrex', name: 'AH-300i WiFi', spec: L('Infrarød dieselvarmer · 15 kW', 'Infrared diesel heater · 15 kW'), price: 29200, unit: L('stk', 'each'), img: img('airrex300'),
+      bullets: L(['Styres fra mobilen', 'For større lokaler'], ['App controlled', 'For larger spaces']) },
+    jack: { cat: 'garasje', brand: 'Sonic', name: L('Garasjejekk lavprofil, lang', 'Low-profile garage jack, long'), spec: L('Lavprofil', 'Low profile'), price: 9639, unit: L('stk', 'each'), img: img('jack'),
+      bullets: L(['Lav innfestingshøyde', 'Lang arm for sportsbiler og elbiler'], ['Low entry height', 'Long reach for low cars and EVs']) },
+    gloves: { cat: 'garasje', brand: 'Dry Rough', name: 'XL 100-pk', spec: L('Engangshansker', 'Disposable gloves'), price: 324, unit: L('pakke', 'pack'), img: img('gloves'),
+      bullets: L(['Slitesterke nitrilhansker', '100 stk, str. XL'], ['Durable nitrile gloves', '100 pcs, size XL']) },
+    nuuk: { cat: 'tilbehor', brand: 'Nuuk', name: 'E-Line Black', spec: L('Skiltholder', 'Number plate holder'), price: 2539, unit: L('stk', 'each'), img: img('nuuk'),
+      bullets: L(['Elegant skiltholder i sort', 'Enkel montering'], ['Sleek black plate holder', 'Easy to fit']) },
   };
+  const shopCats = [
+    { id: 'alle', name: L('Alle', 'All') }, { id: 'dekk', name: L('Dekk', 'Tyres') }, { id: 'olje', name: L('Motorolje', 'Engine oil') },
+    { id: 'pleie', name: L('Bilpleie', 'Car care') }, { id: 'garasje', name: L('Verksted og garasje', 'Workshop and garage') }, { id: 'tilbehor', name: L('Tilbehør', 'Accessories') },
+  ];
+
+  // Opening hours: Gjøvik from mjosbil.no; others assumed to match (to verify).
+  const hours = { workshop: L('Man–fre 08–17', 'Mon–Fri 08–17'), shop: L('Man–fre 08–17 · Lør 10–15', 'Mon–Fri 08–17 · Sat 10–15') };
 
   // "Min bil": what Mjøsbil already knows about the customer's cars (mock).
   const garage = {
@@ -175,5 +199,5 @@ window.MB_DATA = (function () {
     },
   };
 
-  return { cars, services, addons, symptoms, locations, products, garage, wheelPrice, hotelPrice, phone: '61 13 88 88' };
+  return { cars, services, addons, symptoms, locations, products, shopCats, hours, garage, wheelPrice, hotelPrice, phone: '61 13 88 88' };
 })();

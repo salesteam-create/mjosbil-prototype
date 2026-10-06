@@ -4,7 +4,8 @@ Clickable prototype of a new booking journey, homepage, "Min bil" (My car) and s
 
 ## View it
 
-- Open `dist/mjosbil-prototype.html` in any browser (single self-contained file, no install).
+- Live (once GitHub Pages is enabled): https://salesteam-create.github.io/mjosbil-prototype/ (served from `/docs`).
+- Or open `dist/mjosbil-prototype.html` in any browser (single self-contained file, no install).
 - Or open `index.html` while editing the files in `assets/`.
 - After changing anything in `assets/`, run `python3 build.py` to refresh the single-file version.
 
